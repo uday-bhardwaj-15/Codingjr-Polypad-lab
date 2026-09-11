@@ -65,31 +65,41 @@ export const Base10Cube = memo(function Base10Cube({
       cx, cy + r,
     ];
 
-    // Grid lines calculation for 10x10 divisions on each face
+    // Grid lines for 10×10 divisions on each face
     const gridLines: React.ReactNode[] = [];
     const divisions = 10;
 
-    // Top face grid
+    // Top face — 4 corners:
+    //   T=(cx, cy-r), R=(cx+r·cos30, cy-r·sin30), C=(cx,cy), L=(cx-r·cos30, cy-r·sin30)
+    // Lines ∥ to T→R: from lerp(L→T) to lerp(C→R)
+    // Lines ∥ to T→L: from lerp(R→T) to lerp(C→L)
+    const Tx = cx,              Ty = cy - r;
+    const Rx = cx + r * cos30,  Ry = cy - r * sin30;
+    const Cx = cx,              Cy = cy;
+    const Lx = cx - r * cos30,  Ly = cy - r * sin30;
+
     for (let i = 1; i < divisions; i++) {
       const frac = i / divisions;
-      // Parallel to left edge
-      const p1x = (cx - r * cos30) * frac + cx * (1 - frac);
-      const p1y = (cy - r * sin30) * frac + (cy - r) * (1 - frac);
-      const p2x = (cx - r * cos30) * frac + (cx + r * cos30) * (1 - frac);
-      const p2y = (cy - r * sin30) * frac + cy * (1 - frac);
+
+      // Parallel to T→R
+      const p1x = Lx + frac * (Tx - Lx);
+      const p1y = Ly + frac * (Ty - Ly);
+      const p2x = Cx + frac * (Rx - Cx);
+      const p2y = Cy + frac * (Ry - Cy);
       gridLines.push(
         <Line key={`t1_${i}`} points={[p1x, p1y, p2x, p2y]} stroke="rgba(255,255,255,0.4)" strokeWidth={1} />
       );
 
-      // Parallel to right edge
-      const q1x = (cx + r * cos30) * frac + cx * (1 - frac);
-      const q1y = (cy - r * sin30) * frac + (cy - r) * (1 - frac);
-      const q2x = (cx + r * cos30) * frac + (cx - r * cos30) * (1 - frac);
-      const q2y = (cy - r * sin30) * frac + cy * (1 - frac);
+      // Parallel to T→L
+      const q1x = Rx + frac * (Tx - Rx);
+      const q1y = Ry + frac * (Ty - Ry);
+      const q2x = Cx + frac * (Lx - Cx);
+      const q2y = Cy + frac * (Ly - Cy);
       gridLines.push(
         <Line key={`t2_${i}`} points={[q1x, q1y, q2x, q2y]} stroke="rgba(255,255,255,0.4)" strokeWidth={1} />
       );
     }
+
 
     // Left face grid (vertical & isometric slants)
     for (let i = 1; i < divisions; i++) {

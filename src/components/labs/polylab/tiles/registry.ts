@@ -31,6 +31,7 @@ import { Coin } from './probability/Coin';
 import { PlayingCard } from './probability/PlayingCard';
 import { ChartTile } from './probability/ChartTile';
 import { Clock } from './applications/Clock';
+import { Chess } from './applications/Chess';
 
 export interface TileRegistryEntry {
   type: TileType;
@@ -463,6 +464,18 @@ export const TILE_REGISTRY: Record<TileType, TileRegistryEntry> = {
       showDigital: true,
     },
     component: Clock,
+  },
+  'chess': {
+    type: 'chess',
+    name: 'Chess',
+    category: 'applications',
+    description: 'Full 8×8 chessboard with all pieces in starting position, or individual chess pieces',
+    defaultWidth: 328,
+    defaultHeight: 328,
+    defaultProps: {
+      variant: 'board',
+    },
+    component: Chess,
   },
 };
 

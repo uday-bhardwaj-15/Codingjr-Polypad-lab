@@ -20,9 +20,102 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
+
 export interface TileSidebarProps {
   onOpenTour?: () => void;
 }
+
+// ── Playing Cards Panel ────────────────────────────────────────────────────────
+const ALL_RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'] as const;
+type CardSuit = '♣' | '♠' | '♥' | '♦';
+const SUITS: { suit: CardSuit; label: string; color: string; accent: string }[] = [
+  { suit: '♣', label: 'Clubs',    color: '#1E293B', accent: 'bg-slate-800 text-slate-200 border-slate-600' },
+  { suit: '♠', label: 'Spades',   color: '#0F172A', accent: 'bg-slate-900 text-slate-100 border-slate-700' },
+  { suit: '♥', label: 'Hearts',   color: '#DC2626', accent: 'bg-red-900 text-red-100 border-red-700' },
+  { suit: '♦', label: 'Diamonds', color: '#B91C1C', accent: 'bg-red-800 text-red-100 border-red-600' },
+];
+
+function PlayingCardsPanel() {
+  const [activeSuit, setActiveSuit] = useState<CardSuit>('♣');
+  const isRed = activeSuit === '♥' || activeSuit === '♦';
+  const textColor = isRed ? 'text-red-600' : 'text-slate-900';
+
+  return (
+    <div className="bg-[#141520]">
+      {/* Suit Tab Bar */}
+      <div className="flex gap-1 p-2 border-b border-[#2C2D3E]/60">
+        {SUITS.map(({ suit, label, accent }) => (
+          <button
+            key={suit}
+            onClick={() => setActiveSuit(suit)}
+            title={label}
+            className={cn(
+              'flex-1 py-1.5 rounded-lg text-sm font-bold border transition-all cursor-pointer',
+              activeSuit === suit
+                ? accent + ' shadow-md scale-105'
+                : 'bg-transparent text-slate-400 border-transparent hover:bg-[#252638]'
+            )}
+          >
+            {suit}
+          </button>
+        ))}
+      </div>
+
+      {/* Cards Grid – all 13 ranks for active suit */}
+      <div className="p-2 grid grid-cols-4 gap-1.5">
+        {ALL_RANKS.map((rank) => (
+          <ShapeTileItem
+            key={`${activeSuit}-${rank}`}
+            type="playing-card"
+            title={`${rank}${activeSuit}`}
+            presetProps={{ suit: activeSuit, rank, isFaceUp: true }}
+            shapeRender={
+              <div className={cn(
+                'w-10 h-14 bg-white rounded border border-slate-300 flex flex-col items-center justify-between p-1 font-bold shadow-sm',
+                textColor
+              )}>
+                <div className="text-[9px] self-start leading-none font-bold">{rank}{activeSuit}</div>
+                <div className={cn(
+                  'text-sm leading-none',
+                  rank === '10' ? 'text-[11px]' : 'text-base'
+                )}>{activeSuit}</div>
+                <div className="text-[9px] self-end leading-none font-bold rotate-180">{rank}{activeSuit}</div>
+              </div>
+            }
+          />
+        ))}
+
+        {/* Joker */}
+        <ShapeTileItem
+          type="playing-card"
+          title="Joker"
+          presetProps={{ suit: '♠', rank: 'Joker', isFaceUp: true }}
+          shapeRender={
+            <div className="w-10 h-14 bg-gradient-to-b from-purple-600 to-indigo-700 rounded border border-purple-400 flex flex-col items-center justify-center p-1 font-bold shadow-sm">
+              <div className="text-[8px] text-yellow-300 font-bold leading-none">Joker</div>
+              <div className="text-xl leading-none">🃏</div>
+            </div>
+          }
+        />
+
+        {/* Deck of 52 */}
+        <ShapeTileItem
+          type="playing-card"
+          title="Card Back (Deck of 52)"
+          presetProps={{ suit: '♠', rank: 'A', isFaceUp: false }}
+          shapeRender={
+            <div className="w-10 h-14 bg-blue-700 rounded border-2 border-blue-500 flex flex-col items-center justify-center shadow-sm">
+              <div className="w-8 h-12 border border-white/40 rounded-sm flex items-center justify-center">
+                <div className="text-[7px] text-blue-200 font-bold text-center leading-tight">Deck<br/>of 52</div>
+              </div>
+            </div>
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
 
 export function TileSidebar({ onOpenTour }: TileSidebarProps) {
   const [activeCategory, setActiveCategory] =
@@ -1023,86 +1116,91 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                 </button>
 
                 {activeSubSection === "geo_utensils" && (
-                  <div className="p-3 bg-[#141520] grid grid-cols-3 gap-2">
-                    <ShapeTileItem
-                      type="utensil"
-                      title="180° Protractor"
-                      presetProps={{ utensilType: "protractor" }}
-                      shapeRender={
-                        <svg viewBox="0 0 60 40" className="w-12 h-8">
-                          <path
-                            d="M 5,35 A 25,25 0 0,1 55,35 Z"
-                            fill="rgba(56, 189, 248, 0.4)"
-                            stroke="#0284C7"
-                            strokeWidth="1.5"
-                          />
-                          <line
-                            x1="5"
-                            y1="35"
-                            x2="55"
-                            y2="35"
-                            stroke="#0284C7"
-                            strokeWidth="1.5"
-                          />
-                          <line
-                            x1="30"
-                            y1="35"
-                            x2="30"
-                            y2="10"
-                            stroke="#0284C7"
-                            strokeWidth="1"
-                            strokeDasharray="2,2"
-                          />
-                        </svg>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="utensil"
-                      title="Drafting Compass"
-                      presetProps={{ utensilType: "compass" }}
-                      shapeRender={
-                        <svg viewBox="0 0 50 60" className="w-10 h-12">
-                          <circle cx="25" cy="8" r="4" fill="#64748B" />
-                          <line
-                            x1="25"
-                            y1="8"
-                            x2="10"
-                            y2="52"
-                            stroke="#94A3B8"
-                            strokeWidth="3"
-                          />
-                          <line
-                            x1="25"
-                            y1="8"
-                            x2="40"
-                            y2="45"
-                            stroke="#94A3B8"
-                            strokeWidth="3"
-                          />
-                          <rect
-                            x="38"
-                            y="42"
-                            width="5"
-                            height="15"
-                            fill="#F59E0B"
-                          />
-                        </svg>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="utensil"
-                      title="Precision Ruler"
-                      presetProps={{ utensilType: "ruler" }}
-                      shapeRender={
-                        <div className="w-full h-8 bg-amber-200 border-2 border-amber-500 rounded flex items-center justify-between px-1 text-[7px] font-mono text-amber-900 font-bold">
-                          <span>0</span>
-                          <span>|</span>
-                          <span>5</span>
-                          <span>|</span>
-                          <span>10</span>
-                        </div>
-                      }
-                    />
+                  <div className="p-3 bg-[#141520] space-y-2">
+                    {/* Utensil hint */}
+                    <p className="text-[10px] text-slate-400 mb-1 px-1">
+                      Click to place · Compass draws a circle
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {/* Protractor */}
+                      <ShapeTileItem
+                        type="utensil"
+                        title="180° Protractor – click to place"
+                        presetProps={{ utensilType: "protractor" }}
+                        shapeRender={
+                          <div className="flex flex-col items-center gap-0.5">
+                            <svg viewBox="0 0 60 40" className="w-12 h-8">
+                              <path
+                                d="M 5,35 A 25,25 0 0,1 55,35 Z"
+                                fill="rgba(56,189,248,0.35)"
+                                stroke="#0284C7"
+                                strokeWidth="1.5"
+                              />
+                              <line x1="5" y1="35" x2="55" y2="35" stroke="#0284C7" strokeWidth="1.5" />
+                              <line x1="30" y1="35" x2="30" y2="10" stroke="#0284C7" strokeWidth="1" strokeDasharray="2,2" />
+                              {[0,30,60,90,120,150,180].map(deg => {
+                                const rad = (deg * Math.PI) / 180;
+                                const r = 25;
+                                const cx = 30, cy = 35;
+                                const x1 = cx - r * Math.cos(rad), y1 = cy - r * Math.sin(rad);
+                                const x2 = cx - (r - 4) * Math.cos(rad), y2 = cy - (r - 4) * Math.sin(rad);
+                                return <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#0284C7" strokeWidth="1" />;
+                              })}
+                            </svg>
+                            <span className="text-[9px] text-sky-400 font-bold">Protractor</span>
+                          </div>
+                        }
+                      />
+                      {/* Compass → drops a circle polygon */}
+                      <ShapeTileItem
+                        type="polygon"
+                        title="Compass – click to draw a circle"
+                        presetProps={{
+                          sides: 0,
+                          radius: 50,
+                          fillColor: "rgba(0,0,0,0)",
+                          strokeColor: "#0F172A",
+                          strokeWidth: 2,
+                        }}
+                        shapeRender={
+                          <div className="flex flex-col items-center gap-0.5">
+                            <svg viewBox="0 0 50 60" className="w-10 h-12">
+                              <circle cx="25" cy="8" r="4" fill="#64748B" stroke="#1E293B" strokeWidth="1" />
+                              <line x1="25" y1="8" x2="10" y2="52" stroke="#94A3B8" strokeWidth="3" strokeLinecap="round" />
+                              <line x1="25" y1="8" x2="40" y2="45" stroke="#94A3B8" strokeWidth="3" strokeLinecap="round" />
+                              <rect x="37" y="42" width="6" height="14" rx="1" fill="#F59E0B" stroke="#1E293B" strokeWidth="1" />
+                              <line x1="40" y1="56" x2="40" y2="60" stroke="#1E293B" strokeWidth="1.5" />
+                              {/* Arc preview */}
+                              <path d="M 10,52 A 22,22 0 0,0 40,45" fill="none" stroke="#3B82F6" strokeWidth="1" strokeDasharray="2,2" />
+                              <line x1="17" y1="55" x2="26" y2="58" stroke="#475569" strokeWidth="2" />
+                              <circle cx="25" cy="34" r="6" fill="none" stroke="#3B82F6" strokeWidth="1" strokeDasharray="2,2" />
+                            </svg>
+                            <span className="text-[9px] text-blue-400 font-bold">Compass</span>
+                          </div>
+                        }
+                      />
+                      {/* Ruler */}
+                      <ShapeTileItem
+                        type="utensil"
+                        title="Precision Ruler – click to place"
+                        presetProps={{ utensilType: "ruler" }}
+                        shapeRender={
+                          <div className="flex flex-col items-center gap-0.5">
+                            <div className="w-full h-8 bg-amber-100 border-2 border-amber-500 rounded relative overflow-hidden">
+                              <div className="absolute inset-0 flex items-end pb-0.5">
+                                {[0,1,2,3,4,5,6,7,8,9,10].map(n => (
+                                  <div key={n} className="flex-1 flex flex-col items-center">
+                                    <div className={`bg-amber-800 ${n % 5 === 0 ? 'h-3 w-px' : 'h-1.5 w-px'}`} />
+                                    {n % 5 === 0 && <span className="text-[6px] text-amber-900 font-bold leading-none">{n}</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <span className="text-[9px] text-amber-400 font-bold">Ruler</span>
+                          </div>
+                        }
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -1270,23 +1368,26 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                             viewBox="0 0 100 100"
                             className="w-20 h-20 mx-auto"
                           >
+                            {/* Top face */}
                             <polygon
-                              points="50,10 85,30 50,50 15,30"
-                              fill="#8B5CF6"
+                              points="50,8 83,27 50,46 17,27"
+                              fill="#A78BFA"
                               stroke="#1E1E28"
-                              strokeWidth="2"
+                              strokeWidth="1.5"
                             />
+                            {/* Left face */}
                             <polygon
-                              points="15,30 50,50 50,90 15,70"
-                              fill="#6D28D9"
+                              points="17,27 50,46 50,86 17,67"
+                              fill="#7C3AED"
                               stroke="#1E1E28"
-                              strokeWidth="2"
+                              strokeWidth="1.5"
                             />
+                            {/* Right face */}
                             <polygon
-                              points="50,50 85,30 85,70 50,90"
+                              points="50,46 83,27 83,67 50,86"
                               fill="#5B21B6"
                               stroke="#1E1E28"
-                              strokeWidth="2"
+                              strokeWidth="1.5"
                             />
                           </svg>
                         }
@@ -2564,72 +2665,7 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                 </button>
 
                 {activeSubSection === "prob_cards" && (
-                  <div className="p-3 bg-[#141520] grid grid-cols-4 gap-2">
-                    <ShapeTileItem
-                      type="playing-card"
-                      title="Ace of Spades"
-                      presetProps={{ suit: "♠", rank: "A", isFaceUp: true }}
-                      shapeRender={
-                        <div className="w-10 h-14 bg-white rounded border border-slate-900 flex flex-col items-center justify-between p-1 text-slate-900 font-bold shadow-md">
-                          <div className="text-[9px] self-start leading-none">
-                            A♠
-                          </div>
-                          <div className="text-base leading-none">♠</div>
-                          <div className="text-[9px] self-end leading-none">
-                            A♠
-                          </div>
-                        </div>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="playing-card"
-                      title="King of Hearts"
-                      presetProps={{ suit: "♥", rank: "K", isFaceUp: true }}
-                      shapeRender={
-                        <div className="w-10 h-14 bg-white rounded border border-slate-900 flex flex-col items-center justify-between p-1 text-red-600 font-bold shadow-md">
-                          <div className="text-[9px] self-start leading-none">
-                            K♥
-                          </div>
-                          <div className="text-base leading-none">♥</div>
-                          <div className="text-[9px] self-end leading-none">
-                            K♥
-                          </div>
-                        </div>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="playing-card"
-                      title="Queen of Diamonds"
-                      presetProps={{ suit: "♦", rank: "Q", isFaceUp: true }}
-                      shapeRender={
-                        <div className="w-10 h-14 bg-white rounded border border-slate-900 flex flex-col items-center justify-between p-1 text-red-600 font-bold shadow-md">
-                          <div className="text-[9px] self-start leading-none">
-                            Q♦
-                          </div>
-                          <div className="text-base leading-none">♦</div>
-                          <div className="text-[9px] self-end leading-none">
-                            Q♦
-                          </div>
-                        </div>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="playing-card"
-                      title="Jack of Clubs"
-                      presetProps={{ suit: "♣", rank: "J", isFaceUp: true }}
-                      shapeRender={
-                        <div className="w-10 h-14 bg-white rounded border border-slate-900 flex flex-col items-center justify-between p-1 text-slate-900 font-bold shadow-md">
-                          <div className="text-[9px] self-start leading-none">
-                            J♣
-                          </div>
-                          <div className="text-base leading-none">♣</div>
-                          <div className="text-[9px] self-end leading-none">
-                            J♣
-                          </div>
-                        </div>
-                      }
-                    />
-                  </div>
+                  <PlayingCardsPanel />
                 )}
               </div>
 
@@ -2927,7 +2963,7 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
 
           {activeCategory === "applications" && (
             <div className="bg-[#181924] border-t border-[#2C2D3E]/60 divide-y divide-[#2C2D3E]/40">
-              {/* Clocks & Chess */}
+              {/* Clocks */}
               <div>
                 <button
                   onClick={() => toggleSub("app_clocks")}
@@ -2938,7 +2974,7 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                       : "text-slate-300 hover:text-white hover:bg-[#202130]",
                   )}
                 >
-                  <span>Clocks and Chess</span>
+                  <span>Clocks</span>
                   <span className="text-[10px] text-slate-500">
                     {activeSubSection === "app_clocks" ? "▲" : "▼"}
                   </span>
@@ -2956,46 +2992,150 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                       }}
                       shapeRender={
                         <svg viewBox="0 0 60 60" className="w-12 h-12">
-                          <circle
-                            cx="30"
-                            cy="30"
-                            r="26"
-                            fill="#FFFFFF"
-                            stroke="#0F172A"
-                            strokeWidth="3"
-                          />
-                          <line
-                            x1="30"
-                            y1="30"
-                            x2="30"
-                            y2="12"
-                            stroke="#E11D48"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                          <line
-                            x1="30"
-                            y1="30"
-                            x2="42"
-                            y2="30"
-                            stroke="#0F172A"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
+                          <circle cx="30" cy="30" r="26" fill="#FFFFFF" stroke="#0F172A" strokeWidth="3" />
+                          <line x1="30" y1="30" x2="30" y2="12" stroke="#E11D48" strokeWidth="2" strokeLinecap="round" />
+                          <line x1="30" y1="30" x2="42" y2="30" stroke="#0F172A" strokeWidth="3" strokeLinecap="round" />
                           <circle cx="30" cy="30" r="3" fill="#0F172A" />
                         </svg>
                       }
                     />
                     <ShapeTileItem
-                      type="number-card"
-                      title="Chess Knight"
-                      presetProps={{ value: "♞", color: "#1E293B" }}
+                      type="clock"
+                      title="Digital Clock"
+                      presetProps={{ hours: 3, minutes: 45, showDigital: true, radius: 70 }}
                       shapeRender={
-                        <div className="w-10 h-10 rounded-lg bg-slate-800 text-white flex items-center justify-center font-bold text-2xl shadow-md">
-                          ♞
+                        <div className="w-16 h-10 bg-slate-900 rounded-lg border border-slate-700 flex items-center justify-center">
+                          <span className="text-cyan-400 font-mono font-bold text-sm">03:45</span>
                         </div>
                       }
                     />
+                  </div>
+                )}
+              </div>
+
+              {/* Chess */}
+              <div>
+                <button
+                  onClick={() => toggleSub("app_chess")}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-2 text-xs font-semibold transition-colors text-left cursor-pointer",
+                    activeSubSection === "app_chess"
+                      ? "text-white bg-[#252638]"
+                      : "text-slate-300 hover:text-white hover:bg-[#202130]",
+                  )}
+                >
+                  <span>Chess</span>
+                  <span className="text-[10px] text-slate-500">
+                    {activeSubSection === "app_chess" ? "▲" : "▼"}
+                  </span>
+                </button>
+
+                {activeSubSection === "app_chess" && (
+                  <div className="p-3 bg-[#141520] space-y-3">
+                    {/* Full board */}
+                    <div className="p-2 bg-slate-900/60 rounded-xl border border-amber-700/30">
+                      <span className="text-[10px] font-bold text-amber-300 block mb-1.5">
+                        Full Chessboard (starting position)
+                      </span>
+                      <ShapeTileItem
+                        type="chess"
+                        title="Full Chessboard"
+                        presetProps={{ variant: "board" }}
+                        shapeRender={
+                          <div className="mx-auto" style={{ width: 80, height: 80 }}>
+                            <svg viewBox="0 0 80 80" width="80" height="80">
+                              {/* Board */}
+                              {Array.from({ length: 8 }).map((_, row) =>
+                                Array.from({ length: 8 }).map((_, col) => (
+                                  <rect
+                                    key={`s-${row}-${col}`}
+                                    x={col * 10}
+                                    y={row * 10}
+                                    width={10}
+                                    height={10}
+                                    fill={(row + col) % 2 === 0 ? '#F0D9B5' : '#B58863'}
+                                  />
+                                ))
+                              )}
+                              {/* White pieces row 1 */}
+                              {['♖','♘','♗','♕','♔','♗','♘','♖'].map((p, i) => (
+                                <text key={`w1-${i}`} x={i*10+2} y={78} fontSize="8" fontFamily="Georgia,serif" fill="#fff" stroke="#000" strokeWidth="0.3">{p}</text>
+                              ))}
+                              {/* White pawns row 2 */}
+                              {Array.from({length:8}).map((_, i) => (
+                                <text key={`wp-${i}`} x={i*10+2} y={68} fontSize="8" fontFamily="Georgia,serif" fill="#fff" stroke="#000" strokeWidth="0.3">♙</text>
+                              ))}
+                              {/* Black pawns row 7 */}
+                              {Array.from({length:8}).map((_, i) => (
+                                <text key={`bp-${i}`} x={i*10+2} y={18} fontSize="8" fontFamily="Georgia,serif" fill="#1a1a1a">♟</text>
+                              ))}
+                              {/* Black pieces row 8 */}
+                              {['♜','♞','♝','♛','♚','♝','♞','♜'].map((p, i) => (
+                                <text key={`b1-${i}`} x={i*10+2} y={8} fontSize="8" fontFamily="Georgia,serif" fill="#1a1a1a">{p}</text>
+                              ))}
+                            </svg>
+                          </div>
+                        }
+                      />
+                    </div>
+
+                    {/* White pieces */}
+                    <div className="p-2 bg-slate-900/60 rounded-xl border border-slate-600/30">
+                      <span className="text-[10px] font-bold text-slate-300 block mb-1.5">
+                        ♔ White Pieces
+                      </span>
+                      <div className="grid grid-cols-6 gap-1">
+                        {([
+                          { piece: 'K', symbol: '♔', label: 'King' },
+                          { piece: 'Q', symbol: '♕', label: 'Queen' },
+                          { piece: 'R', symbol: '♖', label: 'Rook' },
+                          { piece: 'B', symbol: '♗', label: 'Bishop' },
+                          { piece: 'N', symbol: '♘', label: 'Knight' },
+                          { piece: 'P', symbol: '♙', label: 'Pawn' },
+                        ] as const).map(({ piece, symbol, label }) => (
+                          <ShapeTileItem
+                            key={`wh-${piece}`}
+                            type="chess"
+                            title={`White ${label}`}
+                            presetProps={{ variant: 'piece', piece, color: 'white' }}
+                            shapeRender={
+                              <div className="w-9 h-9 rounded-lg bg-slate-100 border-2 border-slate-300 flex items-center justify-center shadow-sm">
+                                <span className="text-xl text-slate-900 font-bold leading-none" style={{ fontFamily: 'Georgia, serif' }}>{symbol}</span>
+                              </div>
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Black pieces */}
+                    <div className="p-2 bg-slate-900/60 rounded-xl border border-slate-600/30">
+                      <span className="text-[10px] font-bold text-slate-300 block mb-1.5">
+                        ♚ Black Pieces
+                      </span>
+                      <div className="grid grid-cols-6 gap-1">
+                        {([
+                          { piece: 'K', symbol: '♚', label: 'King' },
+                          { piece: 'Q', symbol: '♛', label: 'Queen' },
+                          { piece: 'R', symbol: '♜', label: 'Rook' },
+                          { piece: 'B', symbol: '♝', label: 'Bishop' },
+                          { piece: 'N', symbol: '♞', label: 'Knight' },
+                          { piece: 'P', symbol: '♟', label: 'Pawn' },
+                        ] as const).map(({ piece, symbol, label }) => (
+                          <ShapeTileItem
+                            key={`bl-${piece}`}
+                            type="chess"
+                            title={`Black ${label}`}
+                            presetProps={{ variant: 'piece', piece, color: 'black' }}
+                            shapeRender={
+                              <div className="w-9 h-9 rounded-lg bg-slate-800 border-2 border-slate-600 flex items-center justify-center shadow-sm">
+                                <span className="text-xl text-slate-100 font-bold leading-none" style={{ fontFamily: 'Georgia, serif' }}>{symbol}</span>
+                              </div>
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

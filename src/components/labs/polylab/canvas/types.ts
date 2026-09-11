@@ -29,7 +29,8 @@ export type TileType =
   | 'coin'
   | 'playing-card'
   | 'chart'
-  | 'clock';
+  | 'clock'
+  | 'chess';
 
 export type CategoryType =
   | 'fractions'
