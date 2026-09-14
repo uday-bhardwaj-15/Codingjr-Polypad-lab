@@ -1,31 +1,33 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import dynamic from 'next/dynamic';
-import type Konva from 'konva';
-import { useCanvasStore } from './useCanvasStore';
-import { useKeyboardShortcuts } from './useUndoRedo';
-import { Toolbar } from '../toolbar/Toolbar';
-import { TileSidebar } from '../sidebar/TileSidebar';
-import { FloatingToolsDock } from '../toolbar/FloatingToolsDock';
-import { RightCanvasDock } from '../toolbar/RightCanvasDock';
-import { TileInspector } from '../inspector/TileInspector';
-import { InteractiveTour } from '../tour/InteractiveTour';
-import { useAutosave } from '@/lib/persistence/useAutosave';
-import { loadCanvas as loadCanvasFromStorage } from '@/lib/persistence/polylab.storage';
-
+import React, { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
+import type Konva from "konva";
+import { useCanvasStore } from "./useCanvasStore";
+import { useKeyboardShortcuts } from "./useUndoRedo";
+import { Toolbar } from "../toolbar/Toolbar";
+import { TileSidebar } from "../sidebar/TileSidebar";
+import { FloatingToolsDock } from "../toolbar/FloatingToolsDock";
+import { RightCanvasDock } from "../toolbar/RightCanvasDock";
+import { TileInspector } from "../inspector/TileInspector";
+import { InteractiveTour } from "../tour/InteractiveTour";
+import { useAutosave } from "@/lib/persistence/useAutosave";
+import { loadCanvas as loadCanvasFromStorage } from "@/lib/persistence/polylab.storage";
+import { FunctionMachineModalHost } from "./FunctionMachineModalHost";
 // Dynamic import with SSR disabled for Konva Canvas stage
 const PolyLabStage = dynamic(
-  () => import('./PolyLabStage').then((mod) => mod.PolyLabStage),
+  () => import("./PolyLabStage").then((mod) => mod.PolyLabStage),
   {
     ssr: false,
     loading: () => (
       <div className="w-full h-full flex flex-col items-center justify-center bg-white text-slate-400 gap-3">
         <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <span className="text-xs font-semibold">Loading PolyLab Canvas Engine...</span>
+        <span className="text-xs font-semibold">
+          Loading PolyLab Canvas Engine...
+        </span>
       </div>
     ),
-  }
+  },
 );
 
 export interface PolyLabCanvasProps {
@@ -34,8 +36,8 @@ export interface PolyLabCanvasProps {
 }
 
 export function PolyLabCanvas({
-  canvasId = 'fraction_discovery',
-  initialTitle = 'Math Manipulatives Workspace',
+  canvasId = "fraction_discovery",
+  initialTitle = "Math Manipulatives Workspace",
 }: PolyLabCanvasProps) {
   const [mounted, setMounted] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -67,7 +69,9 @@ export function PolyLabCanvas({
     return (
       <div className="w-screen h-screen flex flex-col items-center justify-center bg-[#181923] text-white gap-3 font-sans">
         <div className="w-9 h-9 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-semibold tracking-wide">Initializing PolyLab Workspace...</span>
+        <span className="text-sm font-semibold tracking-wide">
+          Initializing PolyLab Workspace...
+        </span>
       </div>
     );
   }
@@ -75,10 +79,7 @@ export function PolyLabCanvas({
   return (
     <div className="flex flex-col w-screen h-screen overflow-hidden bg-white font-sans select-none">
       {/* Top Header Toolbar */}
-      <Toolbar
-        stageRef={stageRef}
-        onOpenTour={() => setIsTourOpen(true)}
-      />
+      <Toolbar stageRef={stageRef} onOpenTour={() => setIsTourOpen(true)} />
 
       {/* Main Workspace Area: Sidebar + Stage + Docks */}
       <div className="relative flex-1 flex overflow-hidden">
@@ -88,7 +89,7 @@ export function PolyLabCanvas({
         {/* Center Konva Canvas Area */}
         <main className="relative flex-1 h-full overflow-hidden bg-white">
           <PolyLabStage stageRef={stageRef} />
-
+          <FunctionMachineModalHost />
           {/* Bottom Floating Canvas Tools Dock (Select, Pen, Line, Compass, Text, Math, Eraser, Color) */}
           <FloatingToolsDock />
 

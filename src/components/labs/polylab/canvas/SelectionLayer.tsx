@@ -18,9 +18,16 @@ export const SelectionLayer = memo(function SelectionLayer({
   const updateTile = useCanvasStore((s) => s.updateTile);
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
   const duplicateSelected = useCanvasStore((s) => s.duplicateSelected);
+  const removeTile = useCanvasStore((s) => s.removeTile);
   const removeSelected = useCanvasStore((s) => s.removeSelected);
   const bringToFront = useCanvasStore((s) => s.bringToFront);
   const addTile = useCanvasStore((s) => s.addTile);
+
+  const [resizeStart, setResizeStart] = React.useState<{
+    boundsW: number;
+    boundsH: number;
+    tiles: Record<string, { width: number; height: number }>;
+  } | null>(null);
 
   if (selectedIds.length === 0 && !marqueeBox) return null;
 
@@ -37,20 +44,20 @@ export const SelectionLayer = memo(function SelectionLayer({
     });
   };
 
-  // Split action: e.g. For a FractionBar with count=3, splits it into 3 separate unit fraction bars!
+  // Split action: supports FractionBar (units) and Polyomino (prebuilt puzzle set to pieces)
   const handleSplit = (e: Konva.KonvaEventObject<any>) => {
     e.cancelBubble = true;
     selectedIds.forEach((id) => {
       const t = tiles[id];
       if (!t) return;
+
+      // Fraction bar splitting
       if (t.type === 'fraction-bar') {
         const count = t.props.count || 1;
         const denom = t.props.denominator || 1;
         if (count > 1) {
           const unitW = (t.width || 240) / denom;
-          // Replace current with 1 unit
           updateTileProps(id, { count: 1 });
-          // Spawn remaining units
           for (let i = 1; i < count; i++) {
             addTile({
               type: 'fraction-bar',
@@ -63,6 +70,100 @@ export const SelectionLayer = memo(function SelectionLayer({
           }
         }
       }
+
+      // Polyomino prebuilt set splitting
+      if (t.type === 'polyomino') {
+        const v = t.props.variant || 'pentominoes-set';
+        if (v === 'tetrominoes-set') {
+          removeTile(id);
+          const pieces = [
+            { variant: 'tetromino-T', x: t.x + 10, y: t.y + 10, width: 90, height: 60, color: '#DB2777' },
+            { variant: 'tetromino-L', x: t.x + 100, y: t.y + 10, width: 60, height: 90, color: '#0284C7' },
+            { variant: 'tetromino-O', x: t.x + 100, y: t.y + 60, width: 60, height: 60, color: '#EA580C' },
+            { variant: 'tetromino-Z', x: t.x + 10, y: t.y + 55, width: 60, height: 60, color: '#16A34A' },
+            { variant: 'tetromino-I', x: t.x + 40, y: t.y + 85, width: 120, height: 35, color: '#7C3AED' },
+          ];
+          pieces.forEach((p) => {
+            addTile({
+              type: 'polyomino',
+              x: p.x,
+              y: p.y,
+              width: p.width,
+              height: p.height,
+              props: { variant: p.variant, color: p.color, baseWidth: p.width, baseHeight: p.height },
+            });
+          });
+        } else if (v === 'pentominoes-set') {
+          removeTile(id);
+          const pieces = [
+            { variant: 'pentomino-L', x: t.x + 6, y: t.y + 6, width: 36, height: 108, color: '#16A34A' },
+            { variant: 'pentomino-U', x: t.x + 42, y: t.y + 6, width: 72, height: 72, color: '#0284C7' },
+            { variant: 'pentomino-I', x: t.x + 114, y: t.y + 6, width: 36, height: 72, color: '#7C3AED' },
+            { variant: 'pentomino-X', x: t.x + 150, y: t.y + 6, width: 84, height: 108, color: '#DB2777' },
+            { variant: 'pentomino-P', x: t.x + 186, y: t.y + 6, width: 48, height: 36, color: '#EA580C' },
+            { variant: 'pentomino-Z', x: t.x + 186, y: t.y + 42, width: 48, height: 72, color: '#F59E0B' },
+            { variant: 'pentomino-F', x: t.x + 6, y: t.y + 78, width: 108, height: 36, color: '#0D9488' },
+            { variant: 'pentomino-W', x: t.x + 114, y: t.y + 78, width: 36, height: 36, color: '#9333EA' },
+          ];
+          pieces.forEach((p) => {
+            addTile({
+              type: 'polyomino',
+              x: p.x,
+              y: p.y,
+              width: p.width,
+              height: p.height,
+              props: { variant: p.variant, color: p.color, baseWidth: p.width, baseHeight: p.height },
+            });
+          });
+        }
+      }
+    });
+  };
+
+  const handleResizeStart = (e: Konva.KonvaEventObject<any>) => {
+    e.cancelBubble = true;
+    const tileSizes: Record<string, { width: number; height: number }> = {};
+    selectedTiles.forEach((t) => {
+      tileSizes[t.id] = { width: t.width || 100, height: t.height || 100 };
+    });
+    setResizeStart({
+      boundsW: Math.max(10, bounds.width),
+      boundsH: Math.max(10, bounds.height),
+      tiles: tileSizes,
+    });
+  };
+
+  const handleResizeMove = (e: Konva.KonvaEventObject<any>) => {
+    e.cancelBubble = true;
+    if (!resizeStart) return;
+
+    const node = e.target;
+    const currentX = node.x();
+    const currentY = node.y();
+
+    const newTotalW = Math.max(24, currentX - bounds.minX - 3);
+    const newTotalH = Math.max(24, currentY - bounds.minY - 3);
+
+    const scaleFactorX = newTotalW / resizeStart.boundsW;
+    const scaleFactorY = newTotalH / resizeStart.boundsH;
+
+    selectedTiles.forEach((t) => {
+      const orig = resizeStart.tiles[t.id];
+      if (orig) {
+        updateTile(t.id, {
+          width: Math.max(20, Math.round(orig.width * scaleFactorX)),
+          height: Math.max(20, Math.round(orig.height * scaleFactorY)),
+        });
+      }
+    });
+  };
+
+  const handleResizeEnd = (e: Konva.KonvaEventObject<any>) => {
+    e.cancelBubble = true;
+    setResizeStart(null);
+    e.target.position({
+      x: bounds.minX + bounds.width + 3,
+      y: bounds.minY + bounds.height + 3,
     });
   };
 
@@ -99,6 +200,28 @@ export const SelectionLayer = memo(function SelectionLayer({
             strokeWidth={2}
             cornerRadius={6}
             listening={false}
+          />
+
+          {/* Bottom-Right Resize Handle Dot */}
+          <Circle
+            x={bounds.minX + bounds.width + 3}
+            y={bounds.minY + bounds.height + 3}
+            radius={7}
+            fill="#1E1E28"
+            stroke="#FFFFFF"
+            strokeWidth={2}
+            draggable
+            onDragStart={handleResizeStart}
+            onDragMove={handleResizeMove}
+            onDragEnd={handleResizeEnd}
+            onMouseEnter={(e) => {
+              const container = e.target.getStage()?.container();
+              if (container) container.style.cursor = 'nwse-resize';
+            }}
+            onMouseLeave={(e) => {
+              const container = e.target.getStage()?.container();
+              if (container) container.style.cursor = 'default';
+            }}
           />
 
           {/* Top Center Rotation Handle Pin */}

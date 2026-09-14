@@ -225,6 +225,8 @@ export function PolyLabStage({ stageRef: externalStageRef }: PolyLabStageProps) 
         const initialProps = {
           ...(reg?.defaultProps || {}),
           ...(payload.presetProps || {}),
+          baseWidth: defaultW,
+          baseHeight: defaultH,
         };
 
         addTile({
@@ -328,10 +330,12 @@ export function PolyLabStage({ stageRef: externalStageRef }: PolyLabStageProps) 
             const tile = tiles[id];
             if (!tile) return null;
             const entry = TILE_REGISTRY[tile.type];
-            if (!entry) return null;
-
             const Component = entry.component;
             const isSelected = selectedIds.includes(id);
+            const baseW = tile.props?.baseWidth || entry.defaultWidth || tile.width || 120;
+            const baseH = tile.props?.baseHeight || entry.defaultHeight || tile.height || 80;
+            const scaleX = tile.props?.scaleX !== undefined ? tile.props.scaleX : (tile.width && baseW ? tile.width / baseW : 1);
+            const scaleY = tile.props?.scaleY !== undefined ? tile.props.scaleY : (tile.height && baseH ? tile.height / baseH : 1);
 
             return (
               <Component
@@ -342,6 +346,8 @@ export function PolyLabStage({ stageRef: externalStageRef }: PolyLabStageProps) 
                 rotation={tile.rotation || 0}
                 width={tile.width}
                 height={tile.height}
+                scaleX={scaleX}
+                scaleY={scaleY}
                 isLocked={tile.isLocked}
                 isSelected={isSelected}
                 {...tile.props}

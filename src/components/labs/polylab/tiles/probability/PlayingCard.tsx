@@ -35,8 +35,9 @@ export const PlayingCard = memo(function PlayingCard({
 }: PlayingCardProps) {
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
 
+  const isJoker = rank === 'Joker';
   const isRed = suit === '♥' || suit === '♦';
-  const suitColor = isRed ? '#DC2626' : '#0F172A';
+  const suitColor = isJoker ? '#7C3AED' : isRed ? '#DC2626' : '#0F172A';
 
   const toggleFlip = useCallback(
     (e: Konva.KonvaEventObject<any>) => {
@@ -78,35 +79,61 @@ export const PlayingCard = memo(function PlayingCard({
             <Text
               x={4}
               y={4}
-              text={`${rank}\n${suit}`}
-              fontSize={11}
+              text={isJoker ? "JOKER\n★" : `${rank}\n${suit}`}
+              fontSize={isJoker ? 7 : 11}
               fontStyle="bold"
-              fontFamily="Georgia, serif"
+              fontFamily={isJoker ? "Inter, system-ui, sans-serif" : "Georgia, serif"}
               fill={suitColor}
               listening={false}
             />
 
-            {/* Center Big Suit */}
-            <Text
-              x={0}
-              y={height / 2 - 16}
-              width={width}
-              text={suit}
-              align="center"
-              fontSize={32}
-              fontFamily="Georgia, serif"
-              fill={suitColor}
-              listening={false}
-            />
+            {/* Center Graphic */}
+            {isJoker ? (
+              <Group listening={false}>
+                <Text
+                  x={0}
+                  y={height / 2 - 20}
+                  width={width}
+                  text="🃏"
+                  align="center"
+                  fontSize={26}
+                />
+                <Text
+                  x={0}
+                  y={height / 2 + 8}
+                  width={width}
+                  text="JOKER"
+                  align="center"
+                  fontSize={8}
+                  fontStyle="bold"
+                  fontFamily="Inter, system-ui, sans-serif"
+                  fill="#7C3AED"
+                />
+              </Group>
+            ) : (
+              <Text
+                x={0}
+                y={height / 2 - 16}
+                width={width}
+                text={suit}
+                align="center"
+                fontSize={32}
+                fontFamily="Georgia, serif"
+                fill={suitColor}
+                listening={false}
+              />
+            )}
 
             {/* Bottom-Right Rank & Suit */}
             <Text
-              x={width - 18}
-              y={height - 24}
-              text={`${rank}\n${suit}`}
-              fontSize={11}
+              x={0}
+              y={height - (isJoker ? 22 : 26)}
+              width={width - 4}
+              text={isJoker ? "★\nJOKER" : `${rank}\n${suit}`}
+              align="right"
+              fontSize={isJoker ? 7 : 11}
               fontStyle="bold"
-              fontFamily="Georgia, serif"
+              fontFamily={isJoker ? "Inter, system-ui, sans-serif" : "Georgia, serif"}
               fill={suitColor}
               listening={false}
             />

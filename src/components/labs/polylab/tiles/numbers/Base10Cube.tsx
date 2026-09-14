@@ -19,6 +19,10 @@ export interface Base10CubeProps {
   blockType?: Base10BlockType;
   color?: string;
   size?: number;
+  width?: number;
+  height?: number;
+  scaleX?: number;
+  scaleY?: number;
   isLocked?: boolean;
   isSelected?: boolean;
 }
@@ -31,12 +35,18 @@ export const Base10Cube = memo(function Base10Cube({
   blockType = 'thousand-cube',
   color = '#7C3AED',
   size = 140,
+  width,
+  height,
+  scaleX = 1,
+  scaleY = 1,
   isLocked = false,
   isSelected = false,
 }: Base10CubeProps) {
+  // Effective size: if width/height are provided (from resize), use them
+  const effectiveSize = width ? Math.min(width, height ?? width) : size;
   // 1. Thousand Cube (1000) - Exact match to user close-up reference image!
   if (blockType === 'thousand-cube') {
-    const s = size; // total width / height bound
+    const s = effectiveSize;
     const cx = s / 2;
     const cy = s / 2;
     const r = s * 0.46; // radius of isometric hexagon
@@ -189,7 +199,7 @@ export const Base10Cube = memo(function Base10Cube({
 
   // 2. Hundred Flat (100) - Isometric Flat Slab with 10x10 grid on top
   if (blockType === 'hundred-flat') {
-    const s = 110;
+    const s = effectiveSize > 0 ? effectiveSize : 110;
     const cx = s / 2;
     const cy = s / 2 - 6;
     const r = s * 0.44;
@@ -220,18 +230,25 @@ export const Base10Cube = memo(function Base10Cube({
 
     const gridLines: React.ReactNode[] = [];
     const divisions = 10;
+    const Tx = cx,             Ty = cy - r * 0.7;
+    const Rx = cx + r * cos30, Ry = cy;
+    const Bx = cx,             By = cy + r * 0.7;
+    const Lx = cx - r * cos30, Ly = cy;
+
     for (let i = 1; i < divisions; i++) {
       const frac = i / divisions;
-      const p1x = (cx - r * cos30) * frac + cx * (1 - frac);
-      const p1y = cy * frac + (cy - r * 0.7) * (1 - frac);
-      const p2x = (cx - r * cos30) * frac + (cx + r * cos30) * (1 - frac);
-      const p2y = cy * frac + (cy + r * 0.7) * (1 - frac);
+      // Lines parallel to T->R (from L->T to B->R)
+      const p1x = Lx + frac * (Tx - Lx);
+      const p1y = Ly + frac * (Ty - Ly);
+      const p2x = Bx + frac * (Rx - Bx);
+      const p2y = By + frac * (Ry - By);
       gridLines.push(<Line key={`h1_${i}`} points={[p1x, p1y, p2x, p2y]} stroke="rgba(255,255,255,0.4)" strokeWidth={1} />);
 
-      const q1x = (cx + r * cos30) * frac + cx * (1 - frac);
-      const q1y = cy * frac + (cy - r * 0.7) * (1 - frac);
-      const q2x = (cx + r * cos30) * frac + (cx - r * cos30) * (1 - frac);
-      const q2y = cy * frac + (cy + r * 0.7) * (1 - frac);
+      // Lines parallel to T->L (from R->T to B->L)
+      const q1x = Rx + frac * (Tx - Rx);
+      const q1y = Ry + frac * (Ty - Ry);
+      const q2x = Bx + frac * (Lx - Bx);
+      const q2y = By + frac * (Ly - By);
       gridLines.push(<Line key={`h2_${i}`} points={[q1x, q1y, q2x, q2y]} stroke="rgba(255,255,255,0.4)" strokeWidth={1} />);
     }
 
@@ -249,8 +266,8 @@ export const Base10Cube = memo(function Base10Cube({
 
   // 3. Ten Rod (10) - Isometric 1x10 Rod
   if (blockType === 'ten-rod') {
-    const w = 120;
-    const h = 40;
+    const w = width || 120;
+    const h = height || 40;
     return (
       <TileShell id={id} x={x} y={y} rotation={rotation} width={w} height={h} isLocked={isLocked} isSelected={isSelected}>
         <Group>
@@ -280,7 +297,7 @@ export const Base10Cube = memo(function Base10Cube({
 
   // 4. 3D Connecting Cube (with center socket and isometric shading)
   if (blockType === 'connecting-cube') {
-    const s = 60;
+    const s = effectiveSize > 0 ? effectiveSize : 60;
     const cx = s / 2;
     const cy = s / 2;
     const r = s * 0.44;
@@ -329,7 +346,7 @@ export const Base10Cube = memo(function Base10Cube({
   }
 
   // 5. Unit Cube (1) - 3D Isometric Unit Cube
-  const s = 44;
+  const s = effectiveSize > 0 ? effectiveSize : 44;
   const cx = s / 2;
   const cy = s / 2;
   const r = s * 0.44;

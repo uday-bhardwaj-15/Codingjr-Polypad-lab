@@ -116,6 +116,250 @@ function PlayingCardsPanel() {
   );
 }
 
+// ── Algebra Tiles Panel (Matching Inspiration Image) ───────────────────────────
+function AlgebraTilesPanel() {
+  const [xVal, setXVal] = useState(60);
+  const [yVal, setYVal] = useState(76);
+
+  const u = 24;
+  const xSize = Math.round(u * (xVal / 34));
+  const ySize = Math.round(u * (yVal / 34));
+
+  return (
+    <div className="bg-[#181926] p-3 text-slate-100 select-none">
+      {/* Title */}
+      <div className="text-xs font-bold text-slate-200 mb-2">Algebra Tiles</div>
+
+      {/* POSITIVE TILES GRID */}
+      <div className="flex flex-col gap-1 items-start bg-[#141520] p-2 rounded-lg border border-[#2C2D3E]/60 shadow-inner">
+        {/* Row 0: [1] [x] [y] */}
+        <div className="flex gap-1 items-end">
+          <ShapeTileItem
+            type="algebra-tile"
+            title="1"
+            presetProps={{ variant: "1" }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: u, height: u }} className="bg-amber-500 border border-white flex items-center justify-center font-bold text-xs text-white font-serif shadow-xs">
+                1
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="x"
+            presetProps={{ variant: "x", width: xVal, height: 34 }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: xSize, height: u }} className="bg-emerald-600 border border-white flex items-center justify-center italic font-bold text-xs text-white font-serif shadow-xs">
+                x
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="y"
+            presetProps={{ variant: "y", width: yVal, height: 34 }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: ySize, height: u }} className="bg-cyan-600 border border-white flex items-center justify-center italic font-bold text-xs text-white font-serif shadow-xs">
+                y
+              </div>
+            }
+          />
+        </div>
+
+        {/* Row 1: [x] [x²] [xy] */}
+        <div className="flex gap-1 items-start">
+          <ShapeTileItem
+            type="algebra-tile"
+            title="x"
+            presetProps={{ variant: "x" }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: u, height: xSize }} className="bg-emerald-600 border border-white flex items-center justify-center italic font-bold text-xs text-white font-serif shadow-xs">
+                x
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="x²"
+            presetProps={{ variant: "x2", width: xVal, height: xVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: xSize, height: xSize }} className="bg-blue-600 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                x²
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="xy"
+            presetProps={{ variant: "xy", width: yVal, height: xVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: ySize, height: xSize }} className="bg-indigo-600 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                xy
+              </div>
+            }
+          />
+        </div>
+
+        {/* Row 2: [y] [xy] [y²] */}
+        <div className="flex gap-1 items-start">
+          <ShapeTileItem
+            type="algebra-tile"
+            title="y"
+            presetProps={{ variant: "y" }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: u, height: ySize }} className="bg-cyan-600 border border-white flex items-center justify-center italic font-bold text-xs text-white font-serif shadow-xs">
+                y
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="xy"
+            presetProps={{ variant: "xy", width: xVal, height: yVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: xSize, height: ySize }} className="bg-indigo-600 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                xy
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="y²"
+            presetProps={{ variant: "y2", width: yVal, height: yVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: ySize, height: ySize }} className="bg-purple-700 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                y²
+              </div>
+            }
+          />
+        </div>
+      </div>
+
+      {/* NEGATIVE TILES SECTION */}
+      <div className="flex flex-col gap-1 items-start bg-[#141520] p-2 rounded-lg border border-[#2C2D3E]/60 shadow-inner mt-2">
+        {/* Row 0: [-1] */}
+        <div className="flex gap-1">
+          <ShapeTileItem
+            type="algebra-tile"
+            title="-1"
+            presetProps={{ variant: "-1" }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: u, height: u }} className="bg-rose-700 border border-white flex items-center justify-center font-bold text-xs text-white font-serif shadow-xs">
+                -1
+              </div>
+            }
+          />
+        </div>
+
+        {/* Row 1: [-x] [-x²] */}
+        <div className="flex gap-1 items-start">
+          <ShapeTileItem
+            type="algebra-tile"
+            title="-x"
+            presetProps={{ variant: "-x" }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: u, height: xSize }} className="bg-rose-700 border border-white flex items-center justify-center italic font-bold text-xs text-white font-serif shadow-xs">
+                -x
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="-x²"
+            presetProps={{ variant: "-x2", width: xVal, height: xVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: xSize, height: xSize }} className="bg-rose-700 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                -x²
+              </div>
+            }
+          />
+        </div>
+
+        {/* Row 2: [-y] [-xy] [-y²] */}
+        <div className="flex gap-1 items-start">
+          <ShapeTileItem
+            type="algebra-tile"
+            title="-y"
+            presetProps={{ variant: "-y" }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: u, height: ySize }} className="bg-rose-700 border border-white flex items-center justify-center italic font-bold text-xs text-white font-serif shadow-xs">
+                -y
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="-xy"
+            presetProps={{ variant: "-xy", width: xVal, height: yVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: xSize, height: ySize }} className="bg-rose-700 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                -xy
+              </div>
+            }
+          />
+          <ShapeTileItem
+            type="algebra-tile"
+            title="-y²"
+            presetProps={{ variant: "-y2", width: yVal, height: yVal }}
+            widthClass="w-auto p-0 hover:scale-105"
+            shapeRender={
+              <div style={{ width: ySize, height: ySize }} className="bg-rose-700 border border-white flex items-center justify-center italic font-bold text-sm text-white font-serif shadow-xs">
+                -y²
+              </div>
+            }
+          />
+        </div>
+      </div>
+
+      {/* X & Y SLIDERS AT BOTTOM */}
+      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-[#2C2D3E]/60">
+        {/* Slider X */}
+        <div className="flex-1 flex items-center gap-1.5">
+          <input
+            type="range"
+            min="42"
+            max="75"
+            value={xVal}
+            onChange={(e) => setXVal(Number(e.target.value))}
+            className="w-full accent-slate-400 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+          />
+          <div className="w-5 h-5 rounded-full bg-white text-slate-900 flex items-center justify-center italic font-bold font-serif text-xs shadow-md shrink-0">
+            x
+          </div>
+        </div>
+
+        {/* Slider Y */}
+        <div className="flex-1 flex items-center gap-1.5">
+          <input
+            type="range"
+            min="55"
+            max="95"
+            value={yVal}
+            onChange={(e) => setYVal(Number(e.target.value))}
+            className="w-full accent-slate-400 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+          />
+          <div className="w-5 h-5 rounded-full bg-white text-slate-900 flex items-center justify-center italic font-bold font-serif text-xs shadow-md shrink-0">
+            y
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function TileSidebar({ onOpenTour }: TileSidebarProps) {
   const [activeCategory, setActiveCategory] =
@@ -126,7 +370,9 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
 
   const toggleCategory = (catId: CategoryType, defaultSub: string) => {
     if (activeCategory === catId) {
-      // Toggle category open/close
+      // Collapse the category by clearing it
+      setActiveCategory("" as CategoryType);
+      setActiveSubSection("");
     } else {
       setActiveCategory(catId);
       setActiveSubSection(defaultSub);
@@ -403,131 +649,284 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                   </span>
                 </button>
 
-                {activeSubSection === "geo_polyominoes" && (
-                  <div className="p-3 bg-[#141520] space-y-3">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1">
-                        Pentominoes
-                      </span>
-                      <ShapeTileItem
-                        type="polyomino"
-                        title="Pentominoes Puzzle Set"
-                        presetProps={{
-                          variant: "pentominoes-set",
-                          width: 240,
-                          height: 120,
-                        }}
-                        shapeRender={
-                          <svg
-                            viewBox="0 0 240 120"
-                            className="w-full h-20 rounded-md border-2 border-white/20 bg-slate-900 shadow-md"
-                          >
+                {activeSubSection === "geo_polyominoes" && (() => {
+                  const makeDrag = (variant: string, color: string, w: number, h: number) => ({
+                    draggable: true,
+                    onDragStart: (e: any) => {
+                      e.stopPropagation();
+                      e.dataTransfer.setData(
+                        "application/polylab-tile",
+                        JSON.stringify({
+                          type: "polyomino",
+                          presetProps: { variant, color, width: w, height: h, baseWidth: w, baseHeight: h },
+                        })
+                      );
+                    },
+                    className: "cursor-grab hover:opacity-80 transition-opacity",
+                  } as any);
+
+                  return (
+                    <div className="p-3 bg-[#141520] space-y-4">
+                      {/* Pentominoes Puzzle */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-bold text-slate-300">
+                            Pentominoes (Drag any piece or corner)
+                          </span>
+                          <span className="text-[9px] text-pink-400">split-wise</span>
+                        </div>
+                        <div className="relative rounded-md border-2 border-white/20 bg-slate-900 shadow-md p-1">
+                          <svg viewBox="0 0 240 120" className="w-full h-20 select-none">
+                            {/* Corner piece 1: Green L (top-left corner) */}
                             <path
                               d="M6,6 L42,6 L42,42 L24,42 L24,114 L6,114 Z"
                               fill="#16A34A"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-L", "#16A34A", 48, 120)}
+                            >
+                              <title>Green Corner L-Piece (drag me)</title>
+                            </path>
+
+                            {/* Teal piece */}
                             <path
                               d="M42,6 L114,6 L114,42 L78,42 L78,78 L42,78 Z"
                               fill="#0284C7"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-U", "#0284C7", 80, 80)}
+                            >
+                              <title>Teal U-Piece (drag me)</title>
+                            </path>
+
+                            {/* Purple piece */}
                             <path
                               d="M114,6 L150,6 L150,78 L114,78 Z"
                               fill="#7C3AED"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-I", "#7C3AED", 40, 80)}
+                            >
+                              <title>Purple I-Piece (drag me)</title>
+                            </path>
+
+                            {/* Pink Cross piece */}
                             <path
                               d="M150,6 L186,6 L186,42 L234,42 L234,78 L186,78 L186,114 L150,114 Z"
                               fill="#DB2777"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-X", "#DB2777", 100, 100)}
+                            >
+                              <title>Pink X-Piece (drag me)</title>
+                            </path>
+
+                            {/* Corner piece 2: Red P (top-right corner) */}
                             <path
                               d="M186,6 L234,6 L234,42 L186,42 Z"
                               fill="#EA580C"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-P", "#EA580C", 60, 45)}
+                            >
+                              <title>Red Corner P-Piece (drag me)</title>
+                            </path>
+
+                            {/* Orange Stepped piece */}
                             <path
                               d="M186,42 L234,42 L234,114 L186,114 L186,78 Z"
                               fill="#F59E0B"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-Z", "#F59E0B", 60, 90)}
+                            >
+                              <title>Orange Z-Piece (drag me)</title>
+                            </path>
+
+                            {/* Bottom Teal strip */}
                             <path
                               d="M6,78 L114,78 L114,114 L6,114 Z"
                               fill="#0D9488"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-F", "#0D9488", 120, 40)}
+                            >
+                              <title>Teal F-Piece (drag me)</title>
+                            </path>
+
+                            {/* Bottom Purple base */}
                             <path
                               d="M114,78 L150,78 L150,114 L114,114 Z"
                               fill="#9333EA"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("pentomino-W", "#9333EA", 45, 45)}
+                            >
+                              <title>Purple W-Piece (drag me)</title>
+                            </path>
                           </svg>
-                        }
-                      />
-                    </div>
+                        </div>
 
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 block mb-1">
-                        Tetrominoes
-                      </span>
-                      <ShapeTileItem
-                        type="polyomino"
-                        title="Tetrominoes Puzzle Set"
-                        presetProps={{
-                          variant: "tetrominoes-set",
-                          width: 180,
-                          height: 135,
-                        }}
-                        shapeRender={
-                          <svg
-                            viewBox="0 0 180 135"
-                            className="w-36 h-20 mx-auto rounded-md border-2 border-white/20 bg-slate-900 shadow-md"
-                          >
+                        {/* All 12 Pentomino Pieces */}
+                        <div className="mt-1.5">
+                          <div className="text-[9px] text-slate-400 font-bold mb-1 px-0.5">All 12 Pentominoes — drag any piece</div>
+                          <div className="grid grid-cols-6 gap-1">
+                            <ShapeTileItem type="polyomino" title="F-Pentomino" presetProps={{ variant: "pentomino-F", color: "#0D9488", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M30,0 L90,0 L90,30 L60,30 L60,60 L90,60 L90,90 L30,90 L30,60 L0,60 L0,30 L30,30 Z" fill="#0D9488" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="I-Pentomino" presetProps={{ variant: "pentomino-I", color: "#7C3AED", width: 30, height: 150 }}
+                              shapeRender={<svg viewBox="0 0 30 90" className="w-2 h-9"><path d="M0,0 L30,0 L30,90 L0,90 Z" fill="#7C3AED" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="L-Pentomino" presetProps={{ variant: "pentomino-L", color: "#16A34A", width: 72, height: 72 }}
+                              shapeRender={<svg viewBox="0 0 72 72" className="w-6 h-6"><path d="M0,0 L36,0 L36,36 L72,36 L72,72 L0,72 Z" fill="#16A34A" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="N-Pentomino" presetProps={{ variant: "pentomino-N", color: "#0284C7", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M30,0 L60,0 L60,60 L90,60 L90,90 L30,90 L30,60 L0,60 L0,30 L30,30 Z" fill="#0284C7" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="P-Pentomino" presetProps={{ variant: "pentomino-P", color: "#EA580C", width: 60, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 60 90" className="w-5 h-7"><path d="M0,0 L60,0 L60,60 L30,60 L30,90 L0,90 Z" fill="#EA580C" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="T-Pentomino" presetProps={{ variant: "pentomino-T", color: "#DB2777", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M0,0 L90,0 L90,30 L60,30 L60,90 L30,90 L30,30 L0,30 Z" fill="#DB2777" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="U-Pentomino" presetProps={{ variant: "pentomino-U", color: "#0284C7", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M0,0 L30,0 L30,30 L60,30 L60,0 L90,0 L90,90 L60,90 L60,60 L30,60 L30,90 L0,90 Z" fill="#0284C7" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="V-Pentomino" presetProps={{ variant: "pentomino-V", color: "#8B5CF6", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M0,0 L30,0 L30,60 L90,60 L90,90 L0,90 Z" fill="#8B5CF6" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="W-Pentomino" presetProps={{ variant: "pentomino-W", color: "#9333EA", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M0,0 L30,0 L30,30 L60,30 L60,60 L90,60 L90,90 L30,90 L30,60 L0,60 Z" fill="#9333EA" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="X-Pentomino" presetProps={{ variant: "pentomino-X", color: "#DB2777", width: 108, height: 108 }}
+                              shapeRender={<svg viewBox="0 0 108 108" className="w-7 h-7"><path d="M36,0 L72,0 L72,36 L108,36 L108,72 L72,72 L72,108 L36,108 L36,72 L0,72 L0,36 L36,36 Z" fill="#DB2777" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="Y-Pentomino" presetProps={{ variant: "pentomino-Y", color: "#F59E0B", width: 60, height: 120 }}
+                              shapeRender={<svg viewBox="0 0 60 120" className="w-4 h-8"><path d="M0,30 L30,30 L30,0 L60,0 L60,120 L30,120 L30,60 L0,60 Z" fill="#F59E0B" stroke="#fff" strokeWidth="3"/></svg>} />
+                            <ShapeTileItem type="polyomino" title="Z-Pentomino" presetProps={{ variant: "pentomino-Z", color: "#F59E0B", width: 90, height: 90 }}
+                              shapeRender={<svg viewBox="0 0 90 90" className="w-7 h-7"><path d="M30,0 L90,0 L90,30 L60,30 L60,60 L90,60 L90,90 L30,90 L30,60 L0,60 L0,30 L30,30 Z" fill="#F59E0B" stroke="#fff" strokeWidth="3"/></svg>} />
+                          </div>
+                          <div className="mt-1">
+                            <ShapeTileItem type="polyomino" title="Full Pentominoes Set" presetProps={{ variant: "pentominoes-set", width: 240, height: 120 }}
+                              shapeRender={<div className="text-[9px] font-bold text-slate-300 px-1">⧉ Full Set (split-wise)</div>} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tetrominoes Puzzle */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-bold text-slate-300">
+                            Tetrominoes (Drag any piece or corner)
+                          </span>
+                          <span className="text-[9px] text-pink-400">split-wise</span>
+                        </div>
+                        <div className="relative rounded-md border-2 border-white/20 bg-slate-900 shadow-md p-1">
+                          <svg viewBox="0 0 180 135" className="w-full h-20 select-none">
+                            {/* Tetromino T (Pink - top left corner) */}
                             <path
-                              d="M15,10 L105,10 L105,45 L75,45 L75,80 L45,80 L45,45 L15,45 Z"
+                              d="M 15,10 L 105,10 L 105,45 L 75,45 L 75,80 L 45,80 L 45,45 L 15,45 Z"
                               fill="#DB2777"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("tetromino-T", "#DB2777", 90, 60)}
+                            >
+                              <title>Pink Corner T-Piece (drag me)</title>
+                            </path>
+
+                            {/* Tetromino L (Blue - top right corner) */}
                             <path
-                              d="M105,10 L165,10 L165,80 L135,80 L135,45 L105,45 Z"
+                              d="M 105,10 L 165,10 L 165,80 L 135,80 L 135,45 L 105,45 Z"
                               fill="#0284C7"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("tetromino-L", "#0284C7", 60, 90)}
+                            >
+                              <title>Blue Corner L-Piece (drag me)</title>
+                            </path>
+
+                            {/* Tetromino O Square (Orange) */}
                             <path
-                              d="M105,55 L165,55 L165,115 L105,115 Z"
+                              d="M 105,55 L 165,55 L 165,115 L 105,115 Z"
                               fill="#EA580C"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("tetromino-O", "#EA580C", 60, 60)}
+                            >
+                              <title>Orange O-Square (drag me)</title>
+                            </path>
+
+                            {/* Tetromino Z (Green) */}
                             <path
-                              d="M15,55 L65,55 L65,115 L35,115 L35,85 L15,85 Z"
+                              d="M 15,55 L 65,55 L 65,115 L 35,115 L 35,85 L 15,85 Z"
                               fill="#16A34A"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("tetromino-Z", "#16A34A", 60, 50)}
+                            >
+                              <title>Green Z-Piece (drag me)</title>
+                            </path>
+
+                            {/* Tetromino I (Purple) */}
                             <path
-                              d="M45,85 L165,85 L165,120 L45,120 Z"
+                              d="M 45,85 L 165,85 L 165,120 L 45,120 Z"
                               fill="#7C3AED"
                               stroke="#FFFFFF"
                               strokeWidth="2"
-                            />
+                              {...makeDrag("tetromino-I", "#7C3AED", 120, 30)}
+                            >
+                              <title>Purple I-Bar (drag me)</title>
+                            </path>
                           </svg>
-                        }
-                      />
+                        </div>
+
+                        {/* Individual Tetromino Pieces Quick Drag Strip */}
+                        <div className="grid grid-cols-5 gap-1 mt-1.5">
+                          <ShapeTileItem
+                            type="polyomino"
+                            title="T Piece"
+                            presetProps={{ variant: "tetromino-T", color: "#DB2777", width: 90, height: 60 }}
+                            shapeRender={
+                              <svg viewBox="0 0 90 60" className="w-8 h-6">
+                                <path d="M0,0 L90,0 L90,30 L60,30 L60,60 L30,60 L30,30 L0,30 Z" fill="#DB2777" stroke="#fff" strokeWidth="2"/>
+                              </svg>
+                            }
+                          />
+                          <ShapeTileItem
+                            type="polyomino"
+                            title="L Piece"
+                            presetProps={{ variant: "tetromino-L", color: "#0284C7", width: 60, height: 90 }}
+                            shapeRender={
+                              <svg viewBox="0 0 60 90" className="w-5 h-8">
+                                <path d="M0,0 L30,0 L30,60 L60,60 L60,90 L0,90 Z" fill="#0284C7" stroke="#fff" strokeWidth="2"/>
+                              </svg>
+                            }
+                          />
+                          <ShapeTileItem
+                            type="polyomino"
+                            title="O Square"
+                            presetProps={{ variant: "tetromino-O", color: "#EA580C", width: 60, height: 60 }}
+                            shapeRender={
+                              <svg viewBox="0 0 60 60" className="w-5 h-5">
+                                <path d="M0,0 L60,0 L60,60 L0,60 Z" fill="#EA580C" stroke="#fff" strokeWidth="2"/>
+                              </svg>
+                            }
+                          />
+                          <ShapeTileItem
+                            type="polyomino"
+                            title="Z Piece"
+                            presetProps={{ variant: "tetromino-Z", color: "#16A34A", width: 60, height: 50 }}
+                            shapeRender={
+                              <svg viewBox="0 0 60 50" className="w-6 h-5">
+                                <path d="M0,0 L40,0 L40,25 L60,25 L60,50 L20,50 L20,25 L0,25 Z" fill="#16A34A" stroke="#fff" strokeWidth="2"/>
+                              </svg>
+                            }
+                          />
+                          <ShapeTileItem
+                            type="polyomino"
+                            title="I Bar"
+                            presetProps={{ variant: "tetromino-I", color: "#7C3AED", width: 120, height: 30 }}
+                            shapeRender={
+                              <svg viewBox="0 0 120 30" className="w-9 h-3">
+                                <path d="M0,0 L120,0 L120,30 L0,30 Z" fill="#7C3AED" stroke="#fff" strokeWidth="2"/>
+                              </svg>
+                            }
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
 
               {/* 3. Tangram */}
@@ -1901,13 +2300,13 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                 </button>
 
                 {activeSubSection === "num_grids" && (
-                  <div className="p-3 bg-[#141520]">
+                  <div className="p-3 bg-[#141520] space-y-2">
                     <ShapeTileItem
                       type="number-grid"
                       title="1–100 Number Chart"
-                      presetProps={{ maxNumber: 100 }}
+                      presetProps={{ mode: "chart", maxNumber: 100 }}
                       shapeRender={
-                        <div className="w-28 h-18 bg-white border-2 border-slate-700 rounded p-1 mx-auto grid grid-cols-5 grid-rows-3 gap-0.5 text-[6px] font-bold text-slate-900 text-center">
+                        <div className="w-28 h-16 bg-white border-2 border-slate-700 rounded p-1 mx-auto grid grid-cols-5 grid-rows-3 gap-0.5 text-[6px] font-bold text-slate-900 text-center">
                           <div className="bg-yellow-200">1</div>
                           <div>2</div>
                           <div className="bg-yellow-200">3</div>
@@ -1919,6 +2318,44 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                         </div>
                       }
                     />
+                    <div className="grid grid-cols-2 gap-2">
+                      <ShapeTileItem
+                        type="number-grid"
+                        title="Addition Grid (+)"
+                        presetProps={{ mode: "addition", gridSize: 5, width: 230, height: 260 }}
+                        shapeRender={
+                          <div className="w-full bg-white border-2 border-slate-700 rounded p-1.5 flex flex-col items-center gap-1 shadow-xs">
+                            <div className="text-[10px] font-extrabold text-indigo-700">+ Addition</div>
+                            <div className="grid grid-cols-3 gap-1">
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-600 text-white text-[7px] flex items-center justify-center font-bold">+</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-500 text-white text-[7px] flex items-center justify-center font-bold">1</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-500 text-white text-[7px] flex items-center justify-center font-bold">2</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-500 text-white text-[7px] flex items-center justify-center font-bold">1</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-900 text-[7px] flex items-center justify-center font-bold">2</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-900 text-[7px] flex items-center justify-center font-bold">3</div>
+                            </div>
+                          </div>
+                        }
+                      />
+                      <ShapeTileItem
+                        type="number-grid"
+                        title="Multiplication Grid (×)"
+                        presetProps={{ mode: "multiplication", gridSize: 5, width: 230, height: 260 }}
+                        shapeRender={
+                          <div className="w-full bg-white border-2 border-slate-700 rounded p-1.5 flex flex-col items-center gap-1 shadow-xs">
+                            <div className="text-[10px] font-extrabold text-slate-900">× Multiples</div>
+                            <div className="grid grid-cols-3 gap-1">
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-600 text-white text-[7px] flex items-center justify-center font-bold">×</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-500 text-white text-[7px] flex items-center justify-center font-bold">2</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-500 text-white text-[7px] flex items-center justify-center font-bold">3</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-500 text-white text-[7px] flex items-center justify-center font-bold">2</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-900 text-[7px] flex items-center justify-center font-bold ring-1 ring-slate-900">4</div>
+                              <div className="w-3.5 h-3.5 rounded-full bg-slate-200 text-slate-900 text-[7px] flex items-center justify-center font-bold ring-1 ring-slate-900">6</div>
+                            </div>
+                          </div>
+                        }
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -2160,50 +2597,7 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                   </span>
                 </button>
 
-                {activeSubSection === "alg_tiles" && (
-                  <div className="p-3 bg-[#141520] grid grid-cols-4 gap-2">
-                    <ShapeTileItem
-                      type="algebra-tile"
-                      title="+1 Unit"
-                      presetProps={{ variant: "1" }}
-                      shapeRender={
-                        <div className="w-7 h-7 rounded bg-amber-500 text-white font-bold text-xs flex items-center justify-center border border-amber-600 shadow-xs">
-                          1
-                        </div>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="algebra-tile"
-                      title="-1 Unit"
-                      presetProps={{ variant: "-1" }}
-                      shapeRender={
-                        <div className="w-7 h-7 rounded bg-red-500 text-white font-bold text-xs flex items-center justify-center border border-red-600 shadow-xs">
-                          -1
-                        </div>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="algebra-tile"
-                      title="+x Tile"
-                      presetProps={{ variant: "x" }}
-                      shapeRender={
-                        <div className="w-7 h-14 rounded bg-blue-500 text-white font-bold text-xs flex items-center justify-center border border-blue-600 shadow-xs">
-                          x
-                        </div>
-                      }
-                    />
-                    <ShapeTileItem
-                      type="algebra-tile"
-                      title="+x² Tile"
-                      presetProps={{ variant: "x2" }}
-                      shapeRender={
-                        <div className="w-12 h-12 rounded bg-emerald-500 text-white font-bold text-xs flex items-center justify-center border border-emerald-600 shadow-xs">
-                          x²
-                        </div>
-                      }
-                    />
-                  </div>
-                )}
+                {activeSubSection === "alg_tiles" && <AlgebraTilesPanel />}
               </div>
 
               {/* 2. Balance Scale */}

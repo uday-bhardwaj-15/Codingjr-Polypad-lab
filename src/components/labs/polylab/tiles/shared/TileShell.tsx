@@ -13,6 +13,8 @@ export interface TileShellProps {
   rotation?: number;
   width?: number;
   height?: number;
+  scaleX?: number;
+  scaleY?: number;
   isLocked?: boolean;
   isSelected?: boolean;
   children: React.ReactNode;
@@ -25,6 +27,8 @@ export const TileShell = memo(function TileShell({
   rotation = 0,
   width = 120,
   height = 80,
+  scaleX = 1,
+  scaleY = 1,
   isLocked = false,
   isSelected = false,
   children,
@@ -88,6 +92,8 @@ export const TileShell = memo(function TileShell({
       x={x}
       y={y}
       rotation={rotation}
+      scaleX={scaleX}
+      scaleY={scaleY}
       draggable={!isLocked}
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}
@@ -95,21 +101,6 @@ export const TileShell = memo(function TileShell({
       onClick={handleClick}
       onTap={handleClick}
     >
-      {/* Selection halo highlight */}
-      {isSelected && (
-        <Rect
-          x={-4}
-          y={-4}
-          width={width + 8}
-          height={height + 8}
-          stroke="#3B82F6"
-          strokeWidth={2}
-          dash={[4, 4]}
-          cornerRadius={6}
-          listening={false}
-        />
-      )}
-
       {/* Render tile contents */}
       {children}
     </Group>

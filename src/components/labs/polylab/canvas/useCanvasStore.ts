@@ -1,18 +1,22 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 import type {
   TileInstance,
   CanvasDocument,
   ViewportState,
   GridSettings,
   ToolType,
-} from './types';
+} from "./types";
 
 export interface CanvasState {
   // Document metadata
+  activeFunctionModal: { tileId: string; kind: "input" | "rule" } | null;
+  openFunctionModal: (tileId: string, kind: "input" | "rule") => void;
+  closeFunctionModal: () => void;
+
   canvasId: string;
   title: string;
   isDirty: boolean;
-  saveStatus: 'saved' | 'saving' | 'unsaved' | 'error';
+  saveStatus: "saved" | "saving" | "unsaved" | "error";
   lastSavedAt: Date | null;
 
   // Canvas objects
@@ -32,12 +36,22 @@ export interface CanvasState {
   // Actions
   setCanvasId: (id: string) => void;
   setTitle: (title: string) => void;
-  setSaveStatus: (status: 'saved' | 'saving' | 'unsaved' | 'error') => void;
+  setSaveStatus: (status: "saved" | "saving" | "unsaved" | "error") => void;
 
   // Tile CRUD
-  addTile: (tile: Partial<TileInstance> & { type: TileInstance['type'] }) => string;
-  updateTile: (id: string, patch: Partial<TileInstance>, recordHistory?: boolean) => void;
-  updateTileProps: (id: string, propPatch: Record<string, any>, recordHistory?: boolean) => void;
+  addTile: (
+    tile: Partial<TileInstance> & { type: TileInstance["type"] },
+  ) => string;
+  updateTile: (
+    id: string,
+    patch: Partial<TileInstance>,
+    recordHistory?: boolean,
+  ) => void;
+  updateTileProps: (
+    id: string,
+    propPatch: Record<string, any>,
+    recordHistory?: boolean,
+  ) => void;
   removeTile: (id: string) => void;
   removeSelected: () => void;
   duplicateSelected: () => void;
@@ -80,7 +94,7 @@ const DEFAULT_GRID: GridSettings = {
   size: 30,
   snapToGrid: true,
   snapToTiles: true,
-  type: 'square',
+  type: "square",
 };
 
 const DEFAULT_VIEWPORT: ViewportState = {
@@ -91,31 +105,37 @@ const DEFAULT_VIEWPORT: ViewportState = {
 
 const MAX_HISTORY = 40;
 
-export const useCanvasStore = create<CanvasState>((set, get) => ({
-  canvasId: 'new',
-  title: 'Untitled PolyLab Canvas',
-  isDirty: false,
-  saveStatus: 'saved',
-  lastSavedAt: null,
+import { TILE_REGISTRY } from "../tiles/registry";
 
+export const useCanvasStore = create<CanvasState>((set, get) => ({
+  canvasId: "new",
+  title: "Untitled PolyLab Canvas",
+  isDirty: false,
+  saveStatus: "saved",
+  lastSavedAt: null,
+  activeFunctionModal: null,
+  openFunctionModal: (tileId, kind) =>
+    set({ activeFunctionModal: { tileId, kind } }),
+  closeFunctionModal: () => set({ activeFunctionModal: null }),
   tiles: {},
   tileOrder: [],
   selectedIds: [],
 
   viewport: DEFAULT_VIEWPORT,
   grid: DEFAULT_GRID,
-  tool: 'select',
+  tool: "select",
 
   history: [{ tiles: {}, tileOrder: [] }],
   historyIndex: 0,
 
   setCanvasId: (id) => set({ canvasId: id }),
-  setTitle: (title) => set({ title, isDirty: true, saveStatus: 'unsaved' }),
-  setSaveStatus: (status) => set({
-    saveStatus: status,
-    lastSavedAt: status === 'saved' ? new Date() : get().lastSavedAt,
-    isDirty: status !== 'saved',
-  }),
+  setTitle: (title) => set({ title, isDirty: true, saveStatus: "unsaved" }),
+  setSaveStatus: (status) =>
+    set({
+      saveStatus: status,
+      lastSavedAt: status === "saved" ? new Date() : get().lastSavedAt,
+      isDirty: status !== "saved",
+    }),
 
   pushHistory: () => {
     const { tiles, tileOrder, history, historyIndex } = get();
@@ -135,12 +155,37 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       history: newHistory,
       historyIndex: newHistory.length - 1,
       isDirty: true,
-      saveStatus: 'unsaved',
+      saveStatus: "unsaved",
     });
   },
 
   addTile: (tileData) => {
-    const id = tileData.id || `tile_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const id =
+      tileData.id ||
+      `tile_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const reg = TILE_REGISTRY[tileData.type as keyof typeof TILE_REGISTRY];
+    const defaultW =
+      tileData.width ??
+      tileData.props?.width ??
+      tileData.props?.size ??
+      (tileData.props?.radius ? tileData.props.radius * 2 : undefined) ??
+      reg?.defaultWidth ??
+      120;
+    const defaultH =
+      tileData.height ??
+      tileData.props?.height ??
+      tileData.props?.size ??
+      (tileData.props?.radius ? tileData.props.radius * 2 : undefined) ??
+      reg?.defaultHeight ??
+      80;
+
+    const initialProps = {
+      ...(reg?.defaultProps || {}),
+      ...(tileData.props || {}),
+      baseWidth: defaultW,
+      baseHeight: defaultH,
+    };
+
     const newTile: TileInstance = {
       id,
       type: tileData.type,
@@ -148,11 +193,11 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       y: tileData.y ?? 100,
       rotation: tileData.rotation ?? 0,
       zIndex: tileData.zIndex ?? get().tileOrder.length,
-      width: tileData.width ?? 120,
-      height: tileData.height ?? 80,
+      width: defaultW,
+      height: defaultH,
       isLocked: tileData.isLocked ?? false,
       isFlipped: tileData.isFlipped ?? false,
-      props: tileData.props ?? {},
+      props: initialProps,
     };
 
     set((state) => ({
@@ -179,7 +224,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     if (recordHistory) {
       get().pushHistory();
     } else {
-      set({ isDirty: true, saveStatus: 'unsaved' });
+      set({ isDirty: true, saveStatus: "unsaved" });
     }
   },
 
@@ -200,7 +245,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     if (recordHistory) {
       get().pushHistory();
     } else {
-      set({ isDirty: true, saveStatus: 'unsaved' });
+      set({ isDirty: true, saveStatus: "unsaved" });
     }
   },
 
@@ -369,15 +414,15 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     });
 
     set({
-      canvasId: doc.id || 'canvas_loaded',
-      title: doc.title || 'PolyLab Canvas',
+      canvasId: doc.id || "canvas_loaded",
+      title: doc.title || "PolyLab Canvas",
       tiles: tilesMap,
       tileOrder: order,
       selectedIds: [],
       viewport: doc.viewport || DEFAULT_VIEWPORT,
       grid: doc.grid || DEFAULT_GRID,
       isDirty: false,
-      saveStatus: 'saved',
+      saveStatus: "saved",
       history: [{ tiles: tilesMap, tileOrder: order }],
       historyIndex: 0,
     });
@@ -411,7 +456,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       tileOrder: [...snapshot.tileOrder],
       selectedIds: [],
       isDirty: true,
-      saveStatus: 'unsaved',
+      saveStatus: "unsaved",
     });
   },
 
@@ -426,7 +471,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       tileOrder: [...snapshot.tileOrder],
       selectedIds: [],
       isDirty: true,
-      saveStatus: 'unsaved',
+      saveStatus: "unsaved",
     });
   },
 }));
