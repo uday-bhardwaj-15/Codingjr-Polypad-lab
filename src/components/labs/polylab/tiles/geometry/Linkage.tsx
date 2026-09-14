@@ -41,12 +41,12 @@ export const Linkage = memo(function Linkage({
   // We repurpose the `angle` prop to store the locked pivot state to persist it.
   // angle = 1 -> 'left', angle = 2 -> 'right', angle = 0 -> null
 
-  const handleLeftClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleLeftClick = (e: Konva.KonvaEventObject<any>) => {
     e.cancelBubble = true;
     updateTileProps(id, { angle: lockedPivot === 'left' ? 0 : 1 });
   };
 
-  const handleRightClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+  const handleRightClick = (e: Konva.KonvaEventObject<any>) => {
     e.cancelBubble = true;
     updateTileProps(id, { angle: lockedPivot === 'right' ? 0 : 2 });
   };
@@ -119,8 +119,12 @@ export const Linkage = memo(function Linkage({
             const newX = rightGlobalX - width * Math.cos(newRad);
             const newY = rightGlobalY - width * Math.sin(newRad);
 
-            updateTile(id, { rotation: newAngle, x: newX, y: newY }, true);
+            updateTile(id, { rotation: newAngle, x: newX, y: newY }, false);
             e.target.position({ x: 0, y: rodThickness / 2 });
+          }}
+          onDragEnd={(e) => {
+            e.cancelBubble = true;
+            updateTile(id, {}, true);
           }}
           onMouseEnter={(e) => {
             const container = e.target.getStage()?.container();
@@ -154,8 +158,12 @@ export const Linkage = memo(function Linkage({
             const dx = canvasX - x;
             const dy = canvasY - y;
             let newAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-            updateTile(id, { rotation: newAngle }, true);
+            updateTile(id, { rotation: newAngle }, false);
             e.target.position({ x: width, y: rodThickness / 2 });
+          }}
+          onDragEnd={(e) => {
+            e.cancelBubble = true;
+            updateTile(id, {}, true);
           }}
           onMouseEnter={(e) => {
             const container = e.target.getStage()?.container();
