@@ -35,6 +35,9 @@ export const NumberCard = memo(function NumberCard({
 }: NumberCardProps) {
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
 
+  const intrinsicW = 54;
+  const intrinsicH = 64;
+
   const getBgFill = () => {
     if (color) return color;
     if (variant === 'operator') return '#0F172A';
@@ -50,16 +53,16 @@ export const NumberCard = memo(function NumberCard({
       x={x}
       y={y}
       rotation={rotation}
-      width={width}
-      height={height}
+      width={intrinsicW}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
       <Rect
         x={0}
         y={0}
-        width={width}
-        height={height}
+        width={intrinsicW}
+        height={intrinsicH}
         fill={getBgFill()}
         cornerRadius={10}
         stroke="#E2E8F0"
@@ -70,8 +73,8 @@ export const NumberCard = memo(function NumberCard({
       />
       <Text
         x={0}
-        y={height / 2 - 14}
-        width={width}
+        y={intrinsicH / 2 - 14}
+        width={intrinsicW}
         text={String(value)}
         align="center"
         fontSize={24}

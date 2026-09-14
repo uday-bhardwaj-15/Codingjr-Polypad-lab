@@ -54,6 +54,11 @@ export const Polygon = memo(function Polygon({
   const effectiveR = width ? Math.min(width, height ?? width) / 2 : radius;
   const diameter = effectiveR * 2;
 
+  const actualW = width || diameter;
+  const actualH = height || diameter;
+  const centerX = actualW / 2;
+  const centerY = actualH / 2;
+
   // Calculate vertices for regular n-gon
   const getVertices = (): number[] => {
     if (sides < 3) return [];
@@ -62,8 +67,8 @@ export const Polygon = memo(function Polygon({
     const startAngle = -Math.PI / 2;
     for (let i = 0; i < sides; i++) {
       const angle = startAngle + i * angleStep;
-      const px = effectiveR + effectiveR * Math.cos(angle);
-      const py = effectiveR + effectiveR * Math.sin(angle);
+      const px = centerX + effectiveR * Math.cos(angle);
+      const py = centerY + effectiveR * Math.sin(angle);
       points.push(px, py);
     }
     return points;
@@ -75,8 +80,8 @@ export const Polygon = memo(function Polygon({
       x={x}
       y={y}
       rotation={rotation}
-      width={diameter}
-      height={diameter}
+      width={actualW}
+      height={actualH}
       scaleX={1}
       scaleY={1}
       isLocked={isLocked}
@@ -96,8 +101,8 @@ export const Polygon = memo(function Polygon({
           />
         ) : (
           <Circle
-            x={effectiveR}
-            y={effectiveR}
+            x={centerX}
+            y={centerY}
             radius={effectiveR}
             fill={fillColor}
             stroke={strokeColor}
@@ -111,8 +116,8 @@ export const Polygon = memo(function Polygon({
         {showLabels && (
           <Text
             x={0}
-            y={effectiveR - 7}
-            width={diameter}
+            y={centerY - 7}
+            width={actualW}
             text={POLYGON_NAMES[sides] || `${sides}-gon`}
             align="center"
             fontSize={11}

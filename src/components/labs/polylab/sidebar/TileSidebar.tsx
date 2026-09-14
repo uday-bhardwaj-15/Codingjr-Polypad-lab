@@ -1423,72 +1423,53 @@ export function TileSidebar({ onOpenTour }: TileSidebarProps) {
                   <div className="p-3 bg-[#141520]">
                     <ShapeTileItem
                       type="linkage"
-                      title="4-Bar Linkage"
+                      title="Linkage Bar"
                       presetProps={{ linkageType: "four-bar", angle: 45 }}
                       shapeRender={
-                        <svg viewBox="0 0 100 60" className="w-28 h-16 mx-auto">
+                        <svg viewBox="0 0 100 40" className="w-24 h-10 mx-auto transform -rotate-12">
+                          {/* Outer dark outline */}
                           <line
                             x1="15"
-                            y1="50"
-                            x2="85"
-                            y2="50"
-                            stroke="#64748B"
-                            strokeWidth="2"
-                          />
-                          <line
-                            x1="20"
-                            y1="50"
-                            x2="40"
-                            y2="20"
-                            stroke="#F97316"
-                            strokeWidth="4"
-                            strokeLinecap="round"
-                          />
-                          <line
-                            x1="40"
                             y1="20"
-                            x2="70"
-                            y2="15"
-                            stroke="#3B82F6"
-                            strokeWidth="4"
+                            x2="85"
+                            y2="20"
+                            stroke="#1E1E28"
+                            strokeWidth="16"
                             strokeLinecap="round"
                           />
+                          {/* Colored fill */}
                           <line
-                            x1="80"
-                            y1="50"
-                            x2="70"
-                            y2="15"
-                            stroke="#10B981"
-                            strokeWidth="4"
+                            x1="15"
+                            y1="20"
+                            x2="85"
+                            y2="20"
+                            stroke="#8B5CF6"
+                            strokeWidth="12"
                             strokeLinecap="round"
                           />
-                          <circle
-                            cx="20"
-                            cy="50"
-                            r="3"
-                            fill="#FFF"
-                            stroke="#000"
+                          {/* Inner dark line */}
+                          <line
+                            x1="15"
+                            y1="20"
+                            x2="85"
+                            y2="20"
+                            stroke="#1E1E28"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                           />
+                          {/* Left dot */}
                           <circle
-                            cx="80"
-                            cy="50"
-                            r="3"
-                            fill="#FFF"
-                            stroke="#000"
+                            cx="15"
+                            y="20"
+                            r="2.5"
+                            fill="#1E1E28"
                           />
+                          {/* Right dot */}
                           <circle
-                            cx="40"
+                            cx="85"
                             cy="20"
-                            r="3"
-                            fill="#F97316"
-                            stroke="#FFF"
-                          />
-                          <circle
-                            cx="70"
-                            cy="15"
-                            r="3"
-                            fill="#3B82F6"
-                            stroke="#FFF"
+                            r="2.5"
+                            fill="#1E1E28"
                           />
                         </svg>
                       }

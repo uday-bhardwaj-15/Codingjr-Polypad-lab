@@ -94,6 +94,7 @@ export function EditModal({
             fontSize: 18,
             fontWeight: 700,
             color: "#1E1B4B",
+            backgroundColor: "#FFFFFF",
             outline: "none",
             width: "100%",
             boxSizing: "border-box",

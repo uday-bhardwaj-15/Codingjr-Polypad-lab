@@ -31,9 +31,12 @@ export const NumberLine = memo(function NumberLine({
   isLocked = false,
   isSelected = false,
 }: NumberLineProps) {
-  const lineY = 40;
+  const intrinsicW = 360;
+  const intrinsicH = 80;
+
+  const lineY = intrinsicH / 2;
   const paddingX = 24;
-  const availableWidth = width - paddingX * 2;
+  const availableWidth = intrinsicW - paddingX * 2;
   const range = Math.max(1, max - min);
   const totalSteps = Math.floor(range / step);
 
@@ -43,14 +46,14 @@ export const NumberLine = memo(function NumberLine({
       x={x}
       y={y}
       rotation={rotation}
-      width={width}
-      height={height}
+      width={intrinsicW}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
       {/* Main Axis with Arrows */}
       <Arrow
-        points={[paddingX, lineY, width - paddingX, lineY]}
+        points={[paddingX, lineY, intrinsicW - paddingX, lineY]}
         pointerLength={8}
         pointerWidth={8}
         fill="#1E293B"
@@ -59,7 +62,7 @@ export const NumberLine = memo(function NumberLine({
       />
       {/* Left Arrow head */}
       <Arrow
-        points={[width - paddingX, lineY, paddingX, lineY]}
+        points={[intrinsicW - paddingX, lineY, paddingX, lineY]}
         pointerLength={8}
         pointerWidth={8}
         fill="#1E293B"

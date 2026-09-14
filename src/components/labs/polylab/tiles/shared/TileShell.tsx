@@ -36,6 +36,10 @@ export const TileShell = memo(function TileShell({
   const updateTile = useCanvasStore((s) => s.updateTile);
   const toggleSelection = useCanvasStore((s) => s.toggleSelection);
   const grid = useCanvasStore((s) => s.grid);
+  const tile = useCanvasStore((s) => s.tiles[id]);
+
+  const finalScaleX = tile?.props?.scaleX ?? (tile?.width ? tile.width / width : scaleX);
+  const finalScaleY = tile?.props?.scaleY ?? (tile?.height ? tile.height / height : scaleY);
 
   const handleDragStart = useCallback(
     (e: Konva.KonvaEventObject<DragEvent>) => {
@@ -92,8 +96,8 @@ export const TileShell = memo(function TileShell({
       x={x}
       y={y}
       rotation={rotation}
-      scaleX={scaleX}
-      scaleY={scaleY}
+      scaleX={finalScaleX}
+      scaleY={finalScaleY}
       draggable={!isLocked}
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}

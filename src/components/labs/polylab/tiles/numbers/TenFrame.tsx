@@ -14,6 +14,8 @@ export interface TenFrameProps {
   count?: number;
   counterColor?: string;
   cellSize?: number;
+  width?: number;
+  height?: number;
   isLocked?: boolean;
   isSelected?: boolean;
 }
@@ -26,6 +28,8 @@ export const TenFrame = memo(function TenFrame({
   count = 3,
   counterColor = '#E11D48',
   cellSize = 36,
+  width,
+  height,
   isLocked = false,
   isSelected = false,
 }: TenFrameProps) {
@@ -33,8 +37,9 @@ export const TenFrame = memo(function TenFrame({
 
   const cols = 5;
   const rows = 2;
-  const totalWidth = cols * cellSize;
-  const totalHeight = rows * cellSize;
+  const effectiveCellSize = width ? width / cols : cellSize;
+  const totalWidth = cols * effectiveCellSize;
+  const totalHeight = rows * effectiveCellSize;
   const safeCount = Math.max(0, Math.min(10, Math.round(count)));
 
   const handleCellClick = useCallback(
@@ -78,14 +83,14 @@ export const TenFrame = memo(function TenFrame({
 
       {/* Center horizontal divider */}
       <Line
-        points={[0, cellSize, totalWidth, cellSize]}
+        points={[0, effectiveCellSize, totalWidth, effectiveCellSize]}
         stroke="#1E293B"
         strokeWidth={1.5}
       />
 
       {/* Vertical dividers */}
       {Array.from({ length: cols - 1 }).map((_, i) => {
-        const xPos = (i + 1) * cellSize;
+        const xPos = (i + 1) * effectiveCellSize;
         return (
           <Line
             key={i}
@@ -100,8 +105,8 @@ export const TenFrame = memo(function TenFrame({
       {Array.from({ length: 10 }).map((_, i) => {
         const row = Math.floor(i / cols);
         const col = i % cols;
-        const cellX = col * cellSize;
-        const cellY = row * cellSize;
+        const cellX = col * effectiveCellSize;
+        const cellY = row * effectiveCellSize;
         const isFilled = i < safeCount;
 
         return (
@@ -116,16 +121,16 @@ export const TenFrame = memo(function TenFrame({
             <Rect
               x={0}
               y={0}
-              width={cellSize}
-              height={cellSize}
+              width={effectiveCellSize}
+              height={effectiveCellSize}
               fill="transparent"
             />
             {/* Counter token */}
             {isFilled && (
               <Circle
-                x={cellSize / 2}
-                y={cellSize / 2}
-                radius={cellSize * 0.36}
+                x={effectiveCellSize / 2}
+                y={effectiveCellSize / 2}
+                radius={effectiveCellSize * 0.36}
                 fill={counterColor}
                 stroke="#B91C1C"
                 strokeWidth={1}

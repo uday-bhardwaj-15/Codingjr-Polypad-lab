@@ -44,8 +44,10 @@ export const NumberBar = memo(function NumberBar({
   isLocked = false,
   isSelected = false,
 }: NumberBarProps) {
+  const intrinsicUnitW = 30;
+  const intrinsicH = 36;
   const safeVal = Math.max(1, Math.min(20, Math.round(value)));
-  const totalWidth = safeVal * unitWidth;
+  const totalWidth = safeVal * intrinsicUnitW;
   const colorTheme = CUISENAIRE_COLORS[safeVal] || { bg: '#0284C7', text: '#FFFFFF' };
 
   return (
@@ -55,7 +57,7 @@ export const NumberBar = memo(function NumberBar({
       y={y}
       rotation={rotation}
       width={totalWidth}
-      height={height}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
@@ -63,7 +65,7 @@ export const NumberBar = memo(function NumberBar({
         x={0}
         y={0}
         width={totalWidth}
-        height={height}
+        height={intrinsicH}
         fill={colorTheme.bg}
         cornerRadius={6}
         stroke="#475569"
@@ -76,11 +78,11 @@ export const NumberBar = memo(function NumberBar({
       {/* Unit dividing lines */}
       {showTicks &&
         Array.from({ length: safeVal - 1 }).map((_, i) => {
-          const tickX = (i + 1) * unitWidth;
+          const tickX = (i + 1) * intrinsicUnitW;
           return (
             <Line
               key={i}
-              points={[tickX, 0, tickX, height]}
+              points={[tickX, 0, tickX, intrinsicH]}
               stroke="rgba(0, 0, 0, 0.15)"
               strokeWidth={1}
               dash={[2, 2]}
@@ -92,7 +94,7 @@ export const NumberBar = memo(function NumberBar({
       {showNumbers && (
         <Text
           x={0}
-          y={height / 2 - 8}
+          y={intrinsicH / 2 - 8}
           width={totalWidth}
           text={String(safeVal)}
           align="center"

@@ -268,9 +268,11 @@ export const Base10Cube = memo(function Base10Cube({
   if (blockType === 'ten-rod') {
     const w = width || 120;
     const h = height || 40;
+    const sx = w / 120;
+    const sy = h / 40;
     return (
       <TileShell id={id} x={x} y={y} rotation={rotation} width={w} height={h} isLocked={isLocked} isSelected={isSelected}>
-        <Group>
+        <Group scaleX={sx} scaleY={sy}>
           {/* Top Face Strip */}
           <Line points={[10, 8, 110, 8, 118, 18, 18, 18]} closed fill="#60A5FA" stroke="#1D4ED8" strokeWidth={1.5} />
           {/* Front Face Strip */}

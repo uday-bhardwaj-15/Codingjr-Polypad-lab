@@ -33,27 +33,26 @@ export const Linkage = memo(function Linkage({
   isLocked = false,
   isSelected = false,
 }: LinkageProps) {
+  const updateTile = useCanvasStore((s) => s.updateTile);
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
+  
+  // Pivot state: 'left' | 'right' | null
+  const lockedPivot = (angle === 1) ? 'left' : (angle === 2) ? 'right' : null;
+  // We repurpose the `angle` prop to store the locked pivot state to persist it.
+  // angle = 1 -> 'left', angle = 2 -> 'right', angle = 0 -> null
 
-  const rotateJoint = useCallback(
-    (e: Konva.KonvaEventObject<any>) => {
-      e.cancelBubble = true;
-      const nextAngle = (angle + 30) % 360;
-      updateTileProps(id, { angle: nextAngle });
-    },
-    [id, angle, updateTileProps]
-  );
+  const handleLeftClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    e.cancelBubble = true;
+    updateTileProps(id, { angle: lockedPivot === 'left' ? 0 : 1 });
+  };
 
-  // Linkage geometry
-  const p0 = { x: 30, y: 110 }; // Fixed base 1
-  const p1 = { x: 150, y: 110 }; // Fixed base 2
+  const handleRightClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
+    e.cancelBubble = true;
+    updateTileProps(id, { angle: lockedPivot === 'right' ? 0 : 2 });
+  };
 
-  const r1 = 45; // Crank length
-  const rad = (angle * Math.PI) / 180;
-  const p2 = { x: p0.x + r1 * Math.cos(rad), y: p0.y - r1 * Math.sin(rad) }; // Crank joint
-
-  // Coupler point
-  const p3 = { x: p1.x - 35, y: p2.y - 15 };
+  const color = '#8B5CF6'; // Purple from reference
+  const rodThickness = 20;
 
   return (
     <TileShell
@@ -62,40 +61,110 @@ export const Linkage = memo(function Linkage({
       y={y}
       rotation={rotation}
       width={width}
-      height={height}
+      height={rodThickness} // Outline respects this height
       isLocked={isLocked}
       isSelected={isSelected}
     >
-      <Group onClick={rotateJoint} onTap={rotateJoint}>
-        {/* Base Ground Line */}
-        <Line points={[p0.x - 10, p0.y + 10, p1.x + 10, p1.y + 10]} stroke="#64748B" strokeWidth={3} />
-        {/* Ground Support Triangles */}
-        <Line points={[p0.x - 8, p0.y + 10, p0.x + 8, p0.y + 10, p0.x, p0.y]} closed fill="#475569" />
-        <Line points={[p1.x - 8, p1.y + 10, p1.x + 8, p1.y + 10, p1.x, p1.y]} closed fill="#475569" />
+      <Group>
+        {/* Dark Outline */}
+        <Line
+          points={[0, rodThickness / 2, width, rodThickness / 2]}
+          stroke="#1E1E28"
+          strokeWidth={rodThickness + 6}
+          lineCap="round"
+        />
+        {/* Colored Fill */}
+        <Line
+          points={[0, rodThickness / 2, width, rodThickness / 2]}
+          stroke={color}
+          strokeWidth={rodThickness}
+          lineCap="round"
+        />
+        {/* Inner black line */}
+        <Line
+          points={[0, rodThickness / 2, width, rodThickness / 2]}
+          stroke="#1E1E28"
+          strokeWidth={2}
+          lineCap="round"
+        />
 
-        {/* Link 1: Crank (Orange) */}
-        <Line points={[p0.x, p0.y, p2.x, p2.y]} stroke="#F97316" strokeWidth={6} lineCap="round" />
-        {/* Link 2: Coupler (Blue) */}
-        <Line points={[p2.x, p2.y, p3.x, p3.y]} stroke="#3B82F6" strokeWidth={6} lineCap="round" />
-        {/* Link 3: Rocker (Green) */}
-        <Line points={[p1.x, p1.y, p3.x, p3.y]} stroke="#10B981" strokeWidth={6} lineCap="round" />
-
-        {/* Pivot Joint Hinges */}
-        <Circle x={p0.x} y={p0.y} radius={6} fill="#FFFFFF" stroke="#1E1E28" strokeWidth={2} />
-        <Circle x={p1.x} y={p1.y} radius={6} fill="#FFFFFF" stroke="#1E1E28" strokeWidth={2} />
-        <Circle x={p2.x} y={p2.y} radius={6} fill="#F97316" stroke="#FFFFFF" strokeWidth={2} />
-        <Circle x={p3.x} y={p3.y} radius={6} fill="#3B82F6" stroke="#FFFFFF" strokeWidth={2} />
-
-        {/* Label */}
-        <Text
+        {/* Left Pivot */}
+        <Circle
           x={0}
-          y={4}
-          width={width}
-          text="4-Bar Linkage (Click joint to rotate)"
-          align="center"
-          fontSize={9}
-          fontStyle="bold"
-          fill="#475569"
+          y={rodThickness / 2}
+          radius={5}
+          fill={lockedPivot === 'left' ? '#EF4444' : '#1E1E28'}
+          onClick={handleLeftClick}
+          onTap={handleLeftClick}
+          draggable={!isLocked}
+          onDragStart={(e) => { e.cancelBubble = true; }}
+          onDragMove={(e) => {
+            e.cancelBubble = true;
+            const pos = e.target.getStage()?.getPointerPosition();
+            if (!pos) return;
+            const viewport = useCanvasStore.getState().viewport;
+            const scale = viewport.scale;
+            const canvasX = (pos.x - viewport.x) / scale;
+            const canvasY = (pos.y - viewport.y) / scale;
+            
+            const rad = (rotation * Math.PI) / 180;
+            const rightGlobalX = x + width * Math.cos(rad);
+            const rightGlobalY = y + width * Math.sin(rad);
+
+            const dx = rightGlobalX - canvasX;
+            const dy = rightGlobalY - canvasY;
+            let newAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            const newRad = (newAngle * Math.PI) / 180;
+            const newX = rightGlobalX - width * Math.cos(newRad);
+            const newY = rightGlobalY - width * Math.sin(newRad);
+
+            updateTile(id, { rotation: newAngle, x: newX, y: newY }, true);
+            e.target.position({ x: 0, y: rodThickness / 2 });
+          }}
+          onMouseEnter={(e) => {
+            const container = e.target.getStage()?.container();
+            if (container) container.style.cursor = !isLocked ? 'grab' : 'default';
+          }}
+          onMouseLeave={(e) => {
+            const container = e.target.getStage()?.container();
+            if (container) container.style.cursor = 'default';
+          }}
+        />
+
+        {/* Right Pivot */}
+        <Circle
+          x={width}
+          y={rodThickness / 2}
+          radius={5}
+          fill={lockedPivot === 'right' ? '#EF4444' : '#1E1E28'}
+          onClick={handleRightClick}
+          onTap={handleRightClick}
+          draggable={!isLocked}
+          onDragStart={(e) => { e.cancelBubble = true; }}
+          onDragMove={(e) => {
+            e.cancelBubble = true;
+            const pos = e.target.getStage()?.getPointerPosition();
+            if (!pos) return;
+            const viewport = useCanvasStore.getState().viewport;
+            const scale = viewport.scale;
+            const canvasX = (pos.x - viewport.x) / scale;
+            const canvasY = (pos.y - viewport.y) / scale;
+            
+            const dx = canvasX - x;
+            const dy = canvasY - y;
+            let newAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+            updateTile(id, { rotation: newAngle }, true);
+            e.target.position({ x: width, y: rodThickness / 2 });
+          }}
+          onMouseEnter={(e) => {
+            const container = e.target.getStage()?.container();
+            if (container) container.style.cursor = !isLocked ? 'grab' : 'default';
+          }}
+          onMouseLeave={(e) => {
+            const container = e.target.getStage()?.container();
+            if (container) container.style.cursor = 'default';
+          }}
         />
       </Group>
     </TileShell>

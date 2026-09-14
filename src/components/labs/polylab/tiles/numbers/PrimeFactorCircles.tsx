@@ -54,6 +54,9 @@ export const PrimeFactorCircles = memo(function PrimeFactorCircles({
   isLocked = false,
   isSelected = false,
 }: PrimeFactorCirclesProps) {
+  const intrinsicW = 160;
+  const intrinsicH = 160;
+
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
   const factors = getPrimeFactors(value);
 
@@ -68,8 +71,8 @@ export const PrimeFactorCircles = memo(function PrimeFactorCircles({
     [id, value, updateTileProps]
   );
 
-  const cx = width / 2;
-  const cy = height / 2;
+  const cx = intrinsicW / 2;
+  const cy = intrinsicH / 2;
   const ringRadius = 45;
 
   return (
@@ -78,8 +81,8 @@ export const PrimeFactorCircles = memo(function PrimeFactorCircles({
       x={x}
       y={y}
       rotation={rotation}
-      width={width}
-      height={height}
+      width={intrinsicW}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
@@ -129,8 +132,8 @@ export const PrimeFactorCircles = memo(function PrimeFactorCircles({
         {/* Bottom Label */}
         <Text
           x={0}
-          y={height - 14}
-          width={width}
+          y={intrinsicH - 14}
+          width={intrinsicW}
           text={`Factors: ${factors.join(' × ')}`}
           align="center"
           fontSize={9}

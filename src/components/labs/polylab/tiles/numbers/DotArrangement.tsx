@@ -51,9 +51,12 @@ export const DotArrangement = memo(function DotArrangement({
 
   const dots: { x: number; y: number }[] = [];
 
+  const baseW = 160;
+  const baseH = 130;
+
   if (pattern === 'array') {
-    const spacingX = (width - 40) / (cols - 1 || 1);
-    const spacingY = (height - 50) / (rows - 1 || 1);
+    const spacingX = (baseW - 40) / (cols - 1 || 1);
+    const spacingY = (baseH - 50) / (rows - 1 || 1);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         dots.push({ x: 20 + c * spacingX, y: 25 + r * spacingY });
@@ -63,15 +66,15 @@ export const DotArrangement = memo(function DotArrangement({
     const n = 4; // 1 + 2 + 3 + 4 = 10 dots
     for (let r = 0; r < n; r++) {
       const rowDots = r + 1;
-      const startX = width / 2 - ((rowDots - 1) * 22) / 2;
+      const startX = baseW / 2 - ((rowDots - 1) * 22) / 2;
       const py = 25 + r * 22;
       for (let c = 0; c < rowDots; c++) {
         dots.push({ x: startX + c * 22, y: py });
       }
     }
   } else if (pattern === 'dice-5') {
-    const cx = width / 2;
-    const cy = height / 2 - 5;
+    const cx = baseW / 2;
+    const cy = baseH / 2 - 5;
     dots.push({ x: cx, y: cy });
     dots.push({ x: cx - 35, y: cy - 25 });
     dots.push({ x: cx + 35, y: cy - 25 });
@@ -79,14 +82,18 @@ export const DotArrangement = memo(function DotArrangement({
     dots.push({ x: cx + 35, y: cy + 25 });
   } else {
     // Circle of 8 dots
-    const cx = width / 2;
-    const cy = height / 2 - 5;
+    const cx = baseW / 2;
+    const cy = baseH / 2 - 5;
     const rad = 35;
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
       dots.push({ x: cx + rad * Math.cos(angle), y: cy + rad * Math.sin(angle) });
     }
   }
+
+  const scaleX = width / baseW;
+  const scaleY = height / baseH;
+  const dotScale = Math.min(scaleX, scaleY);
 
   return (
     <TileShell
@@ -117,14 +124,14 @@ export const DotArrangement = memo(function DotArrangement({
         {dots.map((d, i) => (
           <Circle
             key={`dot_${i}`}
-            x={d.x}
-            y={d.y}
-            radius={7}
+            x={d.x * scaleX}
+            y={d.y * scaleY}
+            radius={7 * dotScale}
             fill={color}
             stroke="#1E1E28"
-            strokeWidth={1.5}
+            strokeWidth={1.5 * dotScale}
             shadowColor="rgba(0,0,0,0.15)"
-            shadowBlur={2}
+            shadowBlur={2 * dotScale}
           />
         ))}
 

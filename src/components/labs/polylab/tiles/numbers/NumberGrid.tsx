@@ -17,6 +17,8 @@ export interface NumberGridProps {
   highlighted?: number[];
   filter?: 'none' | 'evens' | 'odds' | 'primes' | 'multiples-5';
   selectedVal?: number | null;
+  activeRow?: number | null;
+  activeCol?: number | null;
   width?: number;
   height?: number;
   isLocked?: boolean;
@@ -38,6 +40,8 @@ export const NumberGrid = memo(function NumberGrid({
   highlighted = [],
   filter = 'none',
   selectedVal = null,
+  activeRow = null,
+  activeCol = null,
   width = 250,
   height = 290,
   isLocked = false,
@@ -48,49 +52,33 @@ export const NumberGrid = memo(function NumberGrid({
   const handleSetMode = useCallback(
     (newMode: 'chart' | 'addition' | 'multiplication', e: Konva.KonvaEventObject<any>) => {
       e.cancelBubble = true;
-      updateTileProps(id, { mode: newMode, highlighted: [], selectedVal: null });
+      updateTileProps(id, { mode: newMode, highlighted: [], selectedVal: null, activeRow: null, activeCol: null });
     },
     [id, updateTileProps]
   );
 
-  // For multiplication: clicking a number sets it as selectedVal and highlights all its multiples in the table
-  const handleMultiplyHeaderClick = useCallback(
-    (num: number, e: Konva.KonvaEventObject<any>) => {
+  const handleCellClick = useCallback(
+    (r: number, c: number, e: Konva.KonvaEventObject<any>) => {
       e.cancelBubble = true;
-      // Find all cells in the table that are multiples of num
-      const multiples: number[] = [];
-      for (let r = 1; r <= gridSize; r++) {
-        for (let c = 1; c <= gridSize; c++) {
-          if ((r * c) % num === 0) multiples.push(r * c);
-        }
+      if (activeRow === r && activeCol === c) {
+        updateTileProps(id, { activeRow: null, activeCol: null });
+      } else {
+        updateTileProps(id, { activeRow: r, activeCol: c });
       }
-      updateTileProps(id, { selectedVal: num, highlighted: Array.from(new Set(multiples)) });
     },
-    [id, gridSize, updateTileProps]
+    [id, activeRow, activeCol, updateTileProps]
   );
 
-  // For addition: clicking a cell toggles it
-  const handleAddCellClick = useCallback(
-    (val: number, e: Konva.KonvaEventObject<any>) => {
+  const handleHeaderClick = useCallback(
+    (r: number, c: number, e: Konva.KonvaEventObject<any>) => {
       e.cancelBubble = true;
-      const next = highlighted.includes(val)
-        ? highlighted.filter((n) => n !== val)
-        : [...highlighted, val];
-      updateTileProps(id, { highlighted: next });
+      if (r === 0) {
+        updateTileProps(id, { activeCol: activeCol === c ? null : c });
+      } else if (c === 0) {
+        updateTileProps(id, { activeRow: activeRow === r ? null : r });
+      }
     },
-    [id, highlighted, updateTileProps]
-  );
-
-  // For multiplication: clicking a product cell toggles ring highlight
-  const handleMulCellClick = useCallback(
-    (val: number, e: Konva.KonvaEventObject<any>) => {
-      e.cancelBubble = true;
-      const next = highlighted.includes(val)
-        ? highlighted.filter((n) => n !== val)
-        : [...highlighted, val];
-      updateTileProps(id, { highlighted: next });
-    },
-    [id, highlighted, updateTileProps]
+    [id, activeRow, activeCol, updateTileProps]
   );
 
   const cycleFilter = useCallback(
@@ -114,13 +102,9 @@ export const NumberGrid = memo(function NumberGrid({
     return false;
   };
 
-  // Tab bar heights
-  const TAB_Y = 6;
-  const TAB_H = 20;
-  const CONTENT_Y = TAB_Y + TAB_H + 8;
-
-  // Tab widths
-  const tabW = Math.floor((width - 12) / 3);
+  const intrinsicW = 250;
+  const intrinsicH = 260; // Slightly shorter since we removed tabs
+  const CONTENT_Y = 10; // Start near the top
 
   return (
     <TileShell
@@ -128,62 +112,31 @@ export const NumberGrid = memo(function NumberGrid({
       x={x}
       y={y}
       rotation={rotation}
-      width={width}
-      height={height}
+      width={intrinsicW}
+      height={intrinsicH}
       scaleX={1}
       scaleY={1}
       isLocked={isLocked}
       isSelected={isSelected}
     >
       <Group>
-        {/* Background */}
         <Rect
-          x={0} y={0} width={width} height={height}
+          x={0} y={0} width={intrinsicW} height={intrinsicH}
           fill="#FFFFFF" stroke="#1E1E28" strokeWidth={2} cornerRadius={8}
           shadowColor="rgba(0,0,0,0.15)" shadowBlur={6}
         />
 
-        {/* ── Mode Tabs ─────────────────────────────────── */}
-        <Group x={6} y={TAB_Y}>
-          {(['chart', 'addition', 'multiplication'] as const).map((m, i) => {
-            const labels = ['100 Chart', '+ Addition', '× Multiply'];
-            const active = mode === m;
-            return (
-              <Group
-                key={m}
-                x={i * tabW}
-                onClick={(e) => handleSetMode(m, e)}
-                onTap={(e) => handleSetMode(m, e)}
-              >
-                <Rect
-                  x={0} y={0} width={tabW - 2} height={TAB_H}
-                  fill={active ? '#1E293B' : '#F1F5F9'}
-                  cornerRadius={4}
-                />
-                <Text
-                  x={0} y={5} width={tabW - 2}
-                  text={labels[i]} align="center" fontSize={7} fontStyle="bold"
-                  fill={active ? '#FFFFFF' : '#64748B'}
-                />
-              </Group>
-            );
-          })}
-        </Group>
-
-        {/* ── MODE 1: 100 Chart ─────────────────────────── */}
         {mode === 'chart' && (
           <Group y={4}>
-            {/* Filter pill */}
-            <Group x={width - 86} y={CONTENT_Y - 6} onClick={cycleFilter} onTap={cycleFilter}>
+            <Group x={intrinsicW - 86} y={CONTENT_Y - 6} onClick={cycleFilter} onTap={cycleFilter}>
               <Rect x={0} y={0} width={78} height={14} fill="#F1F5F9" stroke="#CBD5E1" strokeWidth={1} cornerRadius={3} />
               <Text x={0} y={2} width={78} text={`Filter: ${filter}`} align="center" fontSize={7} fontStyle="bold" fill="#475569" />
             </Group>
-            {/* Grid */}
             {Array.from({ length: maxNumber }).map((_, i) => {
               const num = i + 1;
               const cols = 10;
-              const cellW = (width - 16) / cols;
-              const cellH = (height - CONTENT_Y - 26) / (maxNumber / cols);
+              const cellW = (intrinsicW - 16) / cols;
+              const cellH = (intrinsicH - CONTENT_Y - 26) / (maxNumber / cols);
               const r = Math.floor(i / cols);
               const c = i % cols;
               const cx2 = 8 + c * cellW;
@@ -199,108 +152,66 @@ export const NumberGrid = memo(function NumberGrid({
           </Group>
         )}
 
-        {/* ── MODE 2: Addition Table ─────────────────────── */}
-        {mode === 'addition' && (() => {
+        {(mode === 'addition' || mode === 'multiplication') && (() => {
           const count = gridSize + 1;
           const startX = 10;
           const startY = CONTENT_Y + 6;
-          const spacing = Math.min(36, (width - 20) / count);
+          const spacing = Math.min(36, (intrinsicW - 20) / count);
           const radius = spacing * 0.42;
           const elements: React.ReactNode[] = [];
+          const operator = mode === 'addition' ? '+' : '×';
 
           for (let r = 0; r <= gridSize; r++) {
             for (let c = 0; c <= gridSize; c++) {
               const cx2 = startX + c * spacing + radius;
               const cy2 = startY + r * spacing + radius;
 
-              // Operator corner
               if (r === 0 && c === 0) {
                 elements.push(
-                  <Group key="add_op">
+                  <Group key="op">
                     <Circle cx={cx2} cy={cy2} radius={radius} fill="#475569" />
-                    <Text x={cx2 - radius} y={cy2 - 7} width={radius * 2} text="+" align="center" fontSize={14} fontStyle="bold" fill="#FFFFFF" />
+                    <Text x={cx2 - radius} y={cy2 - 7} width={radius * 2} text={operator} align="center" fontSize={14} fontStyle="bold" fill="#FFFFFF" />
                   </Group>
                 );
                 continue;
               }
-              // Header row (col headers = 1..N in blue)
-              if (r === 0) {
-                elements.push(
-                  <Group key={`add_col_${c}`}>
-                    <Circle cx={cx2} cy={cy2} radius={radius} fill="#3B82F6" />
-                    <Text x={cx2 - radius} y={cy2 - 6} width={radius * 2} text={String(c)} align="center" fontSize={11} fontStyle="bold" fill="#FFFFFF" />
-                  </Group>
-                );
-                continue;
-              }
-              // Header col (row headers = 1..N in red)
-              if (c === 0) {
-                elements.push(
-                  <Group key={`add_row_${r}`}>
-                    <Circle cx={cx2} cy={cy2} radius={radius} fill="#EF4444" />
-                    <Text x={cx2 - radius} y={cy2 - 6} width={radius * 2} text={String(r)} align="center" fontSize={11} fontStyle="bold" fill="#FFFFFF" />
-                  </Group>
-                );
-                continue;
-              }
-              // Sum cell
-              const sum = r + c;
-              const hl = highlighted.includes(sum);
-              elements.push(
-                <Group key={`add_${r}_${c}`} onClick={(e) => handleAddCellClick(sum, e)} onTap={(e) => handleAddCellClick(sum, e)}>
-                  <Circle cx={cx2} cy={cy2} radius={radius} fill="#E2E8F0" stroke={hl ? '#0F172A' : '#CBD5E1'} strokeWidth={hl ? 3.5 : 1} />
-                  <Text x={cx2 - radius} y={cy2 - 6} width={radius * 2} text={String(sum)} align="center" fontSize={sum > 9 ? 9 : 11} fontStyle={hl ? 'bold' : 'normal'} fill="#0F172A" />
-                </Group>
-              );
-            }
-          }
-          return <Group>{elements}</Group>;
-        })()}
 
-        {/* ── MODE 3: Multiplication Table ─────────────── */}
-        {mode === 'multiplication' && (() => {
-          const count = gridSize + 1;
-          const startX = 10;
-          const startY = CONTENT_Y + 6;
-          const spacing = Math.min(36, (width - 20) / count);
-          const radius = spacing * 0.42;
-          const elements: React.ReactNode[] = [];
-
-          for (let r = 0; r <= gridSize; r++) {
-            for (let c = 0; c <= gridSize; c++) {
-              const cx2 = startX + c * spacing + radius;
-              const cy2 = startY + r * spacing + radius;
-
-              // Operator corner
-              if (r === 0 && c === 0) {
-                elements.push(
-                  <Group key="mul_op">
-                    <Circle cx={cx2} cy={cy2} radius={radius} fill="#475569" />
-                    <Text x={cx2 - radius} y={cy2 - 7} width={radius * 2} text="×" align="center" fontSize={14} fontStyle="bold" fill="#FFFFFF" />
-                  </Group>
-                );
-                continue;
-              }
-              // Header row/col — clicking highlights all multiples of that number
               if (r === 0 || c === 0) {
-                const num = r === 0 ? c : r;
-                const isActive = selectedVal === num;
+                const isRowHeader = c === 0;
+                const num = isRowHeader ? r : c;
+                const isActive = isRowHeader ? activeRow === r : activeCol === c;
+                const baseColor = isRowHeader ? '#EF4444' : '#3B82F6';
+                const hlColor = isRowHeader ? '#B91C1C' : '#1D4ED8';
+                
                 elements.push(
-                  <Group key={`mul_hdr_${r}_${c}`} onClick={(e) => handleMultiplyHeaderClick(num, e)} onTap={(e) => handleMultiplyHeaderClick(num, e)}>
-                    <Circle cx={cx2} cy={cy2} radius={radius} fill={isActive ? '#DC2626' : '#475569'} />
+                  <Group key={`hdr_${r}_${c}`} onClick={(e) => handleHeaderClick(r, c, e)} onTap={(e) => handleHeaderClick(r, c, e)}>
+                    <Circle cx={cx2} cy={cy2} radius={radius} fill={isActive ? hlColor : baseColor} />
                     <Text x={cx2 - radius} y={cy2 - 6} width={radius * 2} text={String(num)} align="center" fontSize={11} fontStyle="bold" fill="#FFFFFF" />
                   </Group>
                 );
                 continue;
               }
-              // Product cell
-              const product = r * c;
-              const hl = highlighted.includes(product);
+
+              const val = mode === 'addition' ? r + c : r * c;
+              const isTarget = activeRow === r && activeCol === c;
+              const inPath = (activeRow === r && activeCol !== null && c <= activeCol) || (activeCol === c && activeRow !== null && r <= activeRow);
+              
+              let fill = '#E2E8F0';
+              let stroke = '#CBD5E1';
+              let strokeW = 1;
+              if (isTarget) {
+                fill = '#FDE047';
+                stroke = '#0F172A';
+                strokeW = 2;
+              } else if (inPath) {
+                fill = '#FEF08A';
+                stroke = '#FBBF24';
+              }
+
               elements.push(
-                <Group key={`mul_${r}_${c}`} onClick={(e) => handleMulCellClick(product, e)} onTap={(e) => handleMulCellClick(product, e)}>
-                  {/* Outer ring for multiples */}
-                  <Circle cx={cx2} cy={cy2} radius={radius} fill="#E2E8F0" stroke={hl ? '#0F172A' : '#CBD5E1'} strokeWidth={hl ? 3.5 : 1} />
-                  <Text x={cx2 - radius} y={cy2 - 6} width={radius * 2} text={String(product)} align="center" fontSize={product > 99 ? 8 : 11} fontStyle={hl ? 'bold' : 'normal'} fill="#0F172A" />
+                <Group key={`cell_${r}_${c}`} onClick={(e) => handleCellClick(r, c, e)} onTap={(e) => handleCellClick(r, c, e)}>
+                  <Circle cx={cx2} cy={cy2} radius={radius} fill={fill} stroke={stroke} strokeWidth={strokeW} />
+                  <Text x={cx2 - radius} y={cy2 - 6} width={radius * 2} text={String(val)} align="center" fontSize={val > 99 ? 8 : val > 9 ? 9 : 11} fontStyle={isTarget ? 'bold' : 'normal'} fill="#0F172A" />
                 </Group>
               );
             }

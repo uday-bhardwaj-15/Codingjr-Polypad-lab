@@ -19,6 +19,8 @@ export interface FractionCircleProps {
   mode?: FractionDisplayMode;
   color?: string;
   radius?: number;
+  width?: number;
+  height?: number;
   adjustable?: boolean;
   isLocked?: boolean;
   isSelected?: boolean;
@@ -34,17 +36,21 @@ export const FractionCircle = memo(function FractionCircle({
   mode = 'fraction',
   color,
   radius = 64,
+  width,
+  height,
   adjustable = true,
   isLocked = false,
   isSelected = false,
 }: FractionCircleProps) {
+  const intrinsicRadius = 64;
+  const diameter = intrinsicRadius * 2;
+
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
 
   const safeDenom = Math.max(1, Math.min(24, Math.round(denominator)));
   const safeCount = Math.max(0, Math.min(safeDenom, Math.round(count)));
   const fillColor = color || getFractionColor(safeDenom);
   const slices = sliceAngles(safeDenom);
-  const diameter = radius * 2;
 
   const handleWedgeClick = useCallback(
     (index: number, e: Konva.KonvaEventObject<any>) => {
@@ -82,10 +88,10 @@ export const FractionCircle = memo(function FractionCircle({
       isSelected={isSelected}
     >
       {/* Centered Group container */}
-      <Group x={radius} y={radius}>
+      <Group x={intrinsicRadius} y={intrinsicRadius}>
         {/* Background circle */}
         <Circle
-          radius={radius}
+          radius={intrinsicRadius}
           fill="#F8FAFC"
           stroke="#CBD5E1"
           strokeWidth={1.5}
@@ -101,7 +107,7 @@ export const FractionCircle = memo(function FractionCircle({
           return (
             <Wedge
               key={i}
-              radius={radius - 1}
+              radius={intrinsicRadius - 1}
               angle={slice.sweepAngleDeg}
               rotation={slice.startAngleDeg}
               fill={isShaded ? fillColor : '#F8FAFC'}
@@ -118,7 +124,7 @@ export const FractionCircle = memo(function FractionCircle({
         {mode !== 'hidden' && (
           <Group listening={false}>
             <Circle
-              radius={Math.min(26, radius * 0.42)}
+              radius={Math.min(26, intrinsicRadius * 0.42)}
               fill="#0F172A"
               opacity={0.92}
               shadowColor="rgba(0,0,0,0.2)"
@@ -140,7 +146,7 @@ export const FractionCircle = memo(function FractionCircle({
 
         {/* Stepper controls when selected */}
         {isSelected && adjustable && (
-          <Group x={radius + 12} y={-20}>
+          <Group x={intrinsicRadius + 12} y={-20}>
             <Group onClick={(e) => handleDenomChange(1, e)}>
               <Circle radius={10} fill="#3B82F6" />
               <Text

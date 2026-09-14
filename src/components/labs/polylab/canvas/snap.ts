@@ -53,7 +53,7 @@ export function snapAngle(
  * Bounds calculation for alignment.
  */
 export function getBoundingBox(
-  tiles: Array<{ x: number; y: number; width?: number; height?: number }>
+  tiles: Array<{ x: number; y: number; width?: number; height?: number; rotation?: number }>
 ) {
   if (tiles.length === 0) return { minX: 0, minY: 0, maxX: 0, maxY: 0, width: 0, height: 0 };
   let minX = Infinity;
@@ -64,10 +64,23 @@ export function getBoundingBox(
   for (const t of tiles) {
     const w = t.width ?? 100;
     const h = t.height ?? 100;
-    minX = Math.min(minX, t.x);
-    minY = Math.min(minY, t.y);
-    maxX = Math.max(maxX, t.x + w);
-    maxY = Math.max(maxY, t.y + h);
+    const angleRad = ((t.rotation || 0) * Math.PI) / 180;
+    const cos = Math.cos(angleRad);
+    const sin = Math.sin(angleRad);
+
+    const corners = [
+      { x: t.x, y: t.y },
+      { x: t.x + w * cos, y: t.y + w * sin },
+      { x: t.x + w * cos - h * sin, y: t.y + w * sin + h * cos },
+      { x: t.x - h * sin, y: t.y + h * cos },
+    ];
+
+    for (const p of corners) {
+      minX = Math.min(minX, p.x);
+      minY = Math.min(minY, p.y);
+      maxX = Math.max(maxX, p.x);
+      maxY = Math.max(maxY, p.y);
+    }
   }
 
   return {

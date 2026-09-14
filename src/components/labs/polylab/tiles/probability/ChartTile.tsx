@@ -54,6 +54,9 @@ export const ChartTile = memo(function ChartTile({
   isLocked = false,
   isSelected = false,
 }: ChartTileProps) {
+  const intrinsicW = 280;
+  const intrinsicH = 200;
+
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
 
   // Click on a bar to increment or cycle value
@@ -70,8 +73,8 @@ export const ChartTile = memo(function ChartTile({
   );
 
   const padding = 28;
-  const chartW = width - padding * 2;
-  const chartH = height - padding * 2 - 16;
+  const chartW = intrinsicW - padding * 2;
+  const chartH = intrinsicH - padding * 2 - 16;
   const maxValue = Math.max(10, ...data.map((d) => d.value));
 
   // 1. Interactive Bar Chart
@@ -85,8 +88,8 @@ export const ChartTile = memo(function ChartTile({
         x={x}
         y={y}
         rotation={rotation}
-        width={width}
-        height={height}
+        width={intrinsicW}
+        height={intrinsicH}
         isLocked={isLocked}
         isSelected={isSelected}
       >
@@ -95,8 +98,8 @@ export const ChartTile = memo(function ChartTile({
           <Rect
             x={0}
             y={0}
-            width={width}
-            height={height}
+            width={intrinsicW}
+            height={intrinsicH}
             fill="#FFFFFF"
             stroke="#1E1E28"
             strokeWidth={2}
@@ -218,8 +221,8 @@ export const ChartTile = memo(function ChartTile({
         x={x}
         y={y}
         rotation={rotation}
-        width={width}
-        height={height}
+        width={intrinsicW}
+        height={intrinsicH}
         isLocked={isLocked}
         isSelected={isSelected}
       >
@@ -227,8 +230,8 @@ export const ChartTile = memo(function ChartTile({
           <Rect
             x={0}
             y={0}
-            width={width}
-            height={height}
+            width={intrinsicW}
+            height={intrinsicH}
             fill="#FFFFFF"
             stroke="#1E1E28"
             strokeWidth={2}
@@ -278,8 +281,8 @@ export const ChartTile = memo(function ChartTile({
         x={x}
         y={y}
         rotation={rotation}
-        width={width}
-        height={height}
+        width={intrinsicW}
+        height={intrinsicH}
         isLocked={isLocked}
         isSelected={isSelected}
       >
@@ -287,8 +290,8 @@ export const ChartTile = memo(function ChartTile({
           <Rect
             x={0}
             y={0}
-            width={width}
-            height={height}
+            width={intrinsicW}
+            height={intrinsicH}
             fill="#FFFFFF"
             stroke="#1E1E28"
             strokeWidth={2}
@@ -306,10 +309,10 @@ export const ChartTile = memo(function ChartTile({
           />
 
           {/* Table Header */}
-          <Rect x={12} y={26} width={width - 24} height={20} fill="#F1F5F9" cornerRadius={3} />
+          <Rect x={12} y={26} width={intrinsicW - 24} height={20} fill="#F1F5F9" cornerRadius={3} />
           <Text x={18} y={30} text="Category" fontSize={9} fontStyle="bold" fill="#475569" />
           <Text x={90} y={30} text="Tally" fontSize={9} fontStyle="bold" fill="#475569" />
-          <Text x={width - 55} y={30} text="Frequency" fontSize={9} fontStyle="bold" fill="#475569" />
+          <Text x={intrinsicW - 55} y={30} text="Frequency" fontSize={9} fontStyle="bold" fill="#475569" />
 
           {/* Table Rows */}
           {data.slice(0, 5).map((d, i) => {
@@ -317,11 +320,11 @@ export const ChartTile = memo(function ChartTile({
             const tallies = '||||/ '.repeat(Math.floor(d.value / 5)) + '|'.repeat(d.value % 5);
             return (
               <Group key={`row_${i}`} onClick={(e) => handleBarClick(i, e)} onTap={(e) => handleBarClick(i, e)}>
-                <Rect x={12} y={ry} width={width - 24} height={rowH} fill={i % 2 === 0 ? '#FFFFFF' : '#F8FAFC'} />
+                <Rect x={12} y={ry} width={intrinsicW - 24} height={rowH} fill={i % 2 === 0 ? '#FFFFFF' : '#F8FAFC'} />
                 <Text x={18} y={ry + 5} text={d.label} fontSize={10} fontStyle="bold" fill="#1E293B" />
                 <Text x={90} y={ry + 5} text={tallies || '•'} fontSize={10} fontStyle="bold" fill="#0284C7" fontFamily="monospace" />
-                <Text x={width - 45} y={ry + 5} text={String(d.value)} fontSize={10} fontStyle="bold" fill="#1E293B" />
-                <Line points={[12, ry + rowH, width - 12, ry + rowH]} stroke="#E2E8F0" strokeWidth={1} />
+                <Text x={intrinsicW - 45} y={ry + 5} text={String(d.value)} fontSize={10} fontStyle="bold" fill="#1E293B" />
+                <Line points={[12, ry + rowH, intrinsicW - 12, ry + rowH]} stroke="#E2E8F0" strokeWidth={1} />
               </Group>
             );
           })}
@@ -337,8 +340,8 @@ export const ChartTile = memo(function ChartTile({
       x={x}
       y={y}
       rotation={rotation}
-      width={width}
-      height={height}
+      width={intrinsicW}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
@@ -346,8 +349,8 @@ export const ChartTile = memo(function ChartTile({
         <Rect
           x={0}
           y={0}
-          width={width}
-          height={height}
+          width={intrinsicW}
+          height={intrinsicH}
           fill="#FFFFFF"
           stroke="#1E1E28"
           strokeWidth={2}

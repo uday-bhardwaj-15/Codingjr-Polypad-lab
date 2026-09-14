@@ -64,18 +64,20 @@ export const PatternArt = memo(function PatternArt({
     [id, artType, seed, updateTileProps]
   );
 
-  const cx = width / 2;
-  const cy = height / 2;
+  const intrinsicW = 130;
+  const intrinsicH = 130;
+  const cx = intrinsicW / 2;
+  const cy = intrinsicH / 2;
   const palette = ART_PALETTES[seed % ART_PALETTES.length];
 
-  // 1. Mandala Geometric Star
+  // 1. Mandala Geometric Star - Simplified
   if (artType === 'mandala-star') {
     const petals: React.ReactNode[] = [];
-    const count = 12;
+    const count = 8; // Simplified from 12 to 8
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2;
-      const x1 = cx + 45 * Math.cos(angle);
-      const y1 = cy + 45 * Math.sin(angle);
+      const x1 = cx + 35 * Math.cos(angle);
+      const y1 = cy + 35 * Math.sin(angle);
       const x2 = cx + 55 * Math.cos(angle + Math.PI / count);
       const y2 = cy + 55 * Math.sin(angle + Math.PI / count);
       petals.push(
@@ -92,68 +94,64 @@ export const PatternArt = memo(function PatternArt({
     }
 
     return (
-      <TileShell id={id} x={x} y={y} rotation={rotation} width={width} height={height} isLocked={isLocked} isSelected={isSelected}>
+      <TileShell id={id} x={x} y={y} rotation={rotation} width={intrinsicW} height={intrinsicH} isLocked={isLocked} isSelected={isSelected}>
         <Group onClick={randomizeArt} onTap={randomizeArt}>
-          <Circle x={cx} y={cy} radius={58} fill="#181926" stroke="#2C2D3E" strokeWidth={2} />
+          <Circle x={cx} y={cy} radius={60} fill="#181926" stroke="#2C2D3E" strokeWidth={2} />
           {petals}
-          <Circle x={cx} y={cy} radius={12} fill="#FDE047" stroke="#1E1E28" strokeWidth={1.5} />
+          <Circle x={cx} y={cy} radius={15} fill="#FDE047" stroke="#1E1E28" strokeWidth={1.5} />
         </Group>
       </TileShell>
     );
   }
 
-  // 2. Islamic Geometric Rosette
+  // 2. Islamic Geometric Rosette - Simplified
   if (artType === 'islamic-rosette') {
     const stars: React.ReactNode[] = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 2; i++) {
       const rot = (i * 45);
       stars.push(
         <Rect
           key={`sq_${i}`}
-          x={cx - 32}
-          y={cy - 32}
+          x={cx}
+          y={cy}
           width={64}
           height={64}
           rotation={rot}
           fill="transparent"
           stroke={palette[i % palette.length]}
-          strokeWidth={2}
-          offset={{ x: 0, y: 0 }}
+          strokeWidth={3} // Thicker, simpler
+          offset={{ x: 32, y: 32 }}
         />
       );
     }
     return (
-      <TileShell id={id} x={x} y={y} rotation={rotation} width={width} height={height} isLocked={isLocked} isSelected={isSelected}>
+      <TileShell id={id} x={x} y={y} rotation={rotation} width={intrinsicW} height={intrinsicH} isLocked={isLocked} isSelected={isSelected}>
         <Group onClick={randomizeArt} onTap={randomizeArt}>
-          <Rect x={0} y={0} width={width} height={height} fill="#111827" stroke="#374151" strokeWidth={2} cornerRadius={10} />
+          <Rect x={0} y={0} width={intrinsicW} height={intrinsicH} fill="#111827" stroke="#374151" strokeWidth={2} cornerRadius={10} />
           {stars}
-          <Circle x={cx} y={cy} radius={16} fill="#F59E0B" stroke="#FFFFFF" strokeWidth={1.5} />
+          <Circle x={cx} y={cy} radius={20} fill="#F59E0B" stroke="#FFFFFF" strokeWidth={1.5} />
         </Group>
       </TileShell>
     );
   }
 
-  // 3. Fractal Sierpinski Triangle
+  // 3. Fractal Sierpinski Triangle - Simplified
   if (artType === 'fractal-sierpinski') {
     return (
-      <TileShell id={id} x={x} y={y} rotation={rotation} width={width} height={height} isLocked={isLocked} isSelected={isSelected}>
+      <TileShell id={id} x={x} y={y} rotation={rotation} width={intrinsicW} height={intrinsicH} isLocked={isLocked} isSelected={isSelected}>
         <Group onClick={randomizeArt} onTap={randomizeArt}>
-          {/* Main Triangle */}
-          <Line points={[cx, 10, cx + 55, height - 15, cx - 55, height - 15]} closed fill="#3B82F6" stroke="#1E1E28" strokeWidth={2} />
-          {/* Inverted Center Triangle */}
-          <Line points={[cx, height - 15, cx + 27.5, 60, cx - 27.5, 60]} closed fill="#FFFFFF" stroke="#1E1E28" strokeWidth={1.5} />
-          {/* Sub Triangles */}
-          <Line points={[cx, 60, cx + 13.75, 35, cx - 13.75, 35]} closed fill="#FFFFFF" stroke="#1E1E28" strokeWidth={1} />
+          <Line points={[cx, 15, cx + 50, intrinsicH - 20, cx - 50, intrinsicH - 20]} closed fill="#3B82F6" stroke="#1E1E28" strokeWidth={2} />
+          <Line points={[cx, intrinsicH - 20, cx + 25, 57.5, cx - 25, 57.5]} closed fill="#FFFFFF" stroke="#1E1E28" strokeWidth={1.5} />
         </Group>
       </TileShell>
     );
   }
 
-  // 4. Kaleidoscope Mesh (Default)
+  // 4. Kaleidoscope Mesh (Default) - Simplified
   const lines: React.ReactNode[] = [];
-  const rings = 4;
+  const rings = 3; // Simplified from 4 to 3
   for (let r = 1; r <= rings; r++) {
-    const rad = r * 14;
+    const rad = r * 18; // Increased spacing
     lines.push(
       <Circle
         key={`circ_${r}`}
@@ -168,14 +166,12 @@ export const PatternArt = memo(function PatternArt({
   }
 
   return (
-    <TileShell id={id} x={x} y={y} rotation={rotation} width={width} height={height} isLocked={isLocked} isSelected={isSelected}>
+    <TileShell id={id} x={x} y={y} rotation={rotation} width={intrinsicW} height={intrinsicH} isLocked={isLocked} isSelected={isSelected}>
       <Group onClick={randomizeArt} onTap={randomizeArt}>
-        <Rect x={0} y={0} width={width} height={height} fill="#0F172A" stroke="#334155" strokeWidth={2} cornerRadius={10} />
+        <Rect x={0} y={0} width={intrinsicW} height={intrinsicH} fill="#0F172A" stroke="#334155" strokeWidth={2} cornerRadius={10} />
         {lines}
-        <Line points={[cx, 10, cx, height - 10]} stroke="#FFFFFF" strokeWidth={1} opacity={0.5} />
-        <Line points={[10, cy, width - 10, cy]} stroke="#FFFFFF" strokeWidth={1} opacity={0.5} />
-        <Line points={[15, 15, width - 15, height - 15]} stroke="#FFFFFF" strokeWidth={1} opacity={0.5} />
-        <Line points={[15, height - 15, width - 15, 15]} stroke="#FFFFFF" strokeWidth={1} opacity={0.5} />
+        <Line points={[cx, 15, cx, intrinsicH - 15]} stroke="#FFFFFF" strokeWidth={1.5} opacity={0.6} />
+        <Line points={[15, cy, intrinsicW - 15, cy]} stroke="#FFFFFF" strokeWidth={1.5} opacity={0.6} />
       </Group>
     </TileShell>
   );

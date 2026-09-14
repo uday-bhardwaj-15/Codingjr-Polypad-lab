@@ -47,6 +47,9 @@ export const CoordinateAxes = memo(function CoordinateAxes({
   isLocked = false,
   isSelected = false,
 }: CoordinateAxesProps) {
+  const intrinsicW = 340;
+  const intrinsicH = 240;
+
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
 
   const gridRange = 5; // -5 to +5
@@ -83,8 +86,8 @@ export const CoordinateAxes = memo(function CoordinateAxes({
       x={x}
       y={y}
       rotation={rotation}
-      width={width}
-      height={height}
+      width={intrinsicW}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
@@ -93,8 +96,8 @@ export const CoordinateAxes = memo(function CoordinateAxes({
         <Rect
           x={0}
           y={0}
-          width={width}
-          height={height}
+          width={intrinsicW}
+          height={intrinsicH}
           fill="#FFFFFF"
           stroke="#1E1E28"
           strokeWidth={2}

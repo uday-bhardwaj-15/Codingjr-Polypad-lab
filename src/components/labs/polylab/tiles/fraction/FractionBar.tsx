@@ -40,12 +40,15 @@ export const FractionBar = memo(function FractionBar({
   isLocked = false,
   isSelected = false,
 }: FractionBarProps) {
+  const intrinsicW = 300;
+  const intrinsicH = 50;
+
   const updateTileProps = useCanvasStore((s) => s.updateTileProps);
 
   const safeDenom = Math.max(1, Math.min(24, Math.round(denominator)));
   const safeCount = Math.max(0, Math.min(safeDenom, Math.round(count)));
   const fillColor = color || getFractionColor(safeDenom);
-  const segmentWidth = width / safeDenom;
+  const segmentWidth = intrinsicW / safeDenom;
 
   // Segment click handler
   const handleSegmentClick = useCallback(
@@ -68,8 +71,8 @@ export const FractionBar = memo(function FractionBar({
       x={x}
       y={y}
       rotation={rotation}
-      width={width + 16}
-      height={height}
+      width={intrinsicW + 16}
+      height={intrinsicH}
       isLocked={isLocked}
       isSelected={isSelected}
     >
@@ -77,8 +80,8 @@ export const FractionBar = memo(function FractionBar({
       <Rect
         x={0}
         y={0}
-        width={width}
-        height={height}
+        width={intrinsicW}
+        height={intrinsicH}
         fill="#FFFFFF"
         stroke="#1E1E28"
         strokeWidth={3.5}
@@ -104,14 +107,14 @@ export const FractionBar = memo(function FractionBar({
               x={0}
               y={0}
               width={segmentWidth}
-              height={height}
+              height={intrinsicH}
               fill={isShaded ? fillColor : '#FFFFFF'}
             />
 
             {/* Separator Line */}
             {i > 0 && (
               <Line
-                points={[0, 0, 0, height]}
+                points={[0, 0, 0, intrinsicH]}
                 stroke="#1E1E28"
                 strokeWidth={2}
               />
@@ -121,7 +124,7 @@ export const FractionBar = memo(function FractionBar({
             {mode !== 'hidden' && segmentWidth >= 24 && (
               <Text
                 x={0}
-                y={height / 2 - 8}
+                y={intrinsicH / 2 - 8}
                 width={segmentWidth}
                 text={unitLabel}
                 align="center"
@@ -138,8 +141,8 @@ export const FractionBar = memo(function FractionBar({
 
       {/* Snap tab handle on right edge (Polypad signature) */}
       <Arc
-        x={width}
-        y={height / 2}
+        x={intrinsicW}
+        y={intrinsicH / 2}
         innerRadius={0}
         outerRadius={10}
         angle={180}
@@ -153,8 +156,8 @@ export const FractionBar = memo(function FractionBar({
       <Rect
         x={0}
         y={0}
-        width={width}
-        height={height}
+        width={intrinsicW}
+        height={intrinsicH}
         stroke="#1E1E28"
         strokeWidth={3.5}
         cornerRadius={2}
